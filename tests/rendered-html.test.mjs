@@ -51,3 +51,37 @@ test("setlist search reports missing server configuration safely", async () => {
     if (previous) process.env.SETLIST_FM_API_KEY = previous;
   }
 });
+
+test("setlist search authenticates upstream and returns setlists", async () => {
+  const previousKey = process.env.SETLIST_FM_API_KEY;
+  const previousFetch = globalThis.fetch;
+  const upstreamSetlist = {
+    id: "73e2a6b1",
+    eventDate: "12-07-2026",
+    artist: { name: "Radiohead" },
+    venue: { name: "Test Theatre" },
+    sets: { set: [{ song: [{ name: "Everything in Its Right Place" }] }] },
+  };
+  let capturedRequest;
+  process.env.SETLIST_FM_API_KEY = "test-setlist-key";
+  globalThis.fetch = async (input, init) => {
+    capturedRequest = { input: String(input), init };
+    return Response.json({ setlist: [upstreamSetlist] });
+  };
+
+  try {
+    const response = await request("/api/setlists?artistName=Radiohead");
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), { setlists: [upstreamSetlist] });
+    const upstreamUrl = new URL(capturedRequest.input);
+    assert.equal(upstreamUrl.origin, "https://api.setlist.fm");
+    assert.equal(upstreamUrl.pathname, "/1.0/search/setlists");
+    assert.equal(upstreamUrl.searchParams.get("artistName"), "Radiohead");
+    assert.equal(capturedRequest.init.headers["x-api-key"], "test-setlist-key");
+    assert.equal(capturedRequest.init.headers.Accept, "application/json");
+  } finally {
+    globalThis.fetch = previousFetch;
+    if (previousKey) process.env.SETLIST_FM_API_KEY = previousKey;
+    else delete process.env.SETLIST_FM_API_KEY;
+  }
+});
