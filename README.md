@@ -13,7 +13,7 @@ Spotify login uses Authorization Code with PKCE. The client ID is public by desi
 
 ## API behavior
 
-- Setlist search uses `GET /1.0/search/setlists` with Setlist.fm's required `x-api-key` header.
+- Setlist search uses `GET /rest/1.0/search/setlists` with Setlist.fm's required `x-api-key` header.
 - Playlist creation uses Spotify's `POST /me/playlists` endpoint.
 - Matched tracks are added in setlist order with `POST /playlists/{playlist_id}/items`, in batches of 100.
 - Cover songs are searched using the credited cover artist when Setlist.fm supplies one.

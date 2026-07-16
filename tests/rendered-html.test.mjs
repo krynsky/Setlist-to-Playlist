@@ -75,7 +75,7 @@ test("setlist search authenticates upstream and returns setlists", async () => {
     assert.deepEqual(await response.json(), { setlists: [upstreamSetlist] });
     const upstreamUrl = new URL(capturedRequest.input);
     assert.equal(upstreamUrl.origin, "https://api.setlist.fm");
-    assert.equal(upstreamUrl.pathname, "/1.0/search/setlists");
+    assert.equal(upstreamUrl.pathname, "/rest/1.0/search/setlists");
     assert.equal(upstreamUrl.searchParams.get("artistName"), "Radiohead");
     assert.equal(capturedRequest.init.headers["x-api-key"], "test-setlist-key");
     assert.equal(capturedRequest.init.headers.Accept, "application/json");

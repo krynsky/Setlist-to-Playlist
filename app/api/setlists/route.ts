@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const SETLIST_API = "https://api.setlist.fm/1.0/search/setlists";
+const SETLIST_API = "https://api.setlist.fm/rest/1.0/search/setlists";
 
 export async function GET(request: NextRequest) {
   const artistName = request.nextUrl.searchParams.get("artistName")?.trim();
