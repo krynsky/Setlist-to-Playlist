@@ -35,6 +35,10 @@ test("server-renders the Encore app shell", async () => {
   assert.match(html, />City</);
   assert.match(html, />Year</);
   assert.match(html, /Connect Spotify/);
+  assert.match(
+    html,
+    /Created by <a href="https:\/\/krynsky\.com\/">Mark Krynsky<\/a>/,
+  );
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/);
 });
 

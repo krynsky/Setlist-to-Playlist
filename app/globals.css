@@ -87,6 +87,9 @@ h1 em { color: var(--acid); }
 .success strong { font-size: 14px; }
 .success p { margin: 3px 0 0; color: #b8cbb9; font-size: 12px; }
 footer { padding: 25px; color: #71809c; border-top: 1px solid #263653; text-align: center; font: 11px var(--font-geist-mono); }
+.creator-credit { margin: -14px 0 25px; color: #71809c; text-align: center; font: 11px var(--font-geist-mono); }
+.creator-credit a { color: #9db1d3; text-underline-offset: 3px; }
+.creator-credit a:hover { color: #fff; }
 
 @media (max-width: 760px) {
   .nav { padding: 0 18px; }

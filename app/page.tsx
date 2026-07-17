@@ -621,6 +621,9 @@ export default function Home() {
         Powered by Setlist.fm and Spotify · Your Spotify login stays between you
         and Spotify.
       </footer>
+      <p className="creator-credit">
+        Created by <a href="https://krynsky.com/">Mark Krynsky</a>
+      </p>
     </main>
   );
 }
