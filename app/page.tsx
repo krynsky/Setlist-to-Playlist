@@ -210,6 +210,28 @@ async function findSpotifyTrack(
   return result.tracks?.items?.[0] ?? null;
 }
 
+async function enforceSpotifyPlaylistPrivacy(
+  playlistId: string,
+  isPublic: boolean,
+  clientId: string | null,
+) {
+  await spotifyRequest(`/playlists/${playlistId}`, {
+    method: "PUT",
+    body: JSON.stringify({ public: isPublic }),
+  }, clientId);
+
+  const confirmedPlaylist = await spotifyRequest(
+    `/playlists/${playlistId}`,
+    {},
+    clientId,
+  );
+  if (confirmedPlaylist?.public !== isPublic) {
+    throw new Error(
+      `Spotify did not confirm that the playlist is ${isPublic ? "public" : "private"}.`,
+    );
+  }
+}
+
 export default function Home() {
   const [artist, setArtist] = useState("");
   const [city, setCity] = useState("");
@@ -226,6 +248,7 @@ export default function Home() {
     url: string;
     added: number;
     unmatched: string[];
+    isPublic: boolean;
   } | null>(null);
 
   const songs = useMemo(
@@ -367,6 +390,9 @@ export default function Home() {
         }),
       }, spotifyClientId);
 
+      setStatus(`Confirming the playlist is ${isPublic ? "public" : "private"}…`);
+      await enforceSpotifyPlaylistPrivacy(playlist.id, isPublic, spotifyClientId);
+
       for (let index = 0; index < uris.length; index += 100) {
         await spotifyRequest(`/playlists/${playlist.id}/items`, {
           method: "POST",
@@ -378,8 +404,9 @@ export default function Home() {
         url: playlist.external_urls.spotify,
         added: uris.length,
         unmatched,
+        isPublic,
       });
-      setStatus("Playlist created.");
+      setStatus(`${isPublic ? "Public" : "Private"} playlist created.`);
     } catch (error) {
       setConnected(hasSpotifySession());
       setStatus(error instanceof Error ? error.message : "Playlist creation failed.");
@@ -570,7 +597,7 @@ export default function Home() {
           <div>
             <strong>Your playlist is ready</strong>
             <p>
-              {success.added} songs added
+              {success.isPublic ? "Public" : "Private"} · {success.added} songs added
               {success.unmatched.length
                 ? ` · ${success.unmatched.length} unmatched: ${success.unmatched.join(", ")}`
                 : ""}

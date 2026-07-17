@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 async function render(path = "/") {
@@ -35,6 +36,22 @@ test("server-renders the Encore app shell", async () => {
   assert.match(html, />Year</);
   assert.match(html, /Connect Spotify/);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/);
+});
+
+test("playlist creation explicitly enforces and verifies the selected privacy", async () => {
+  const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  assert.match(
+    source,
+    /spotifyRequest\(`\/playlists\/\$\{playlistId\}`,\s*\{\s*method: "PUT",\s*body: JSON\.stringify\(\{ public: isPublic \}\)/s,
+  );
+  assert.match(
+    source,
+    /confirmedPlaylist\?\.public !== isPublic/,
+  );
+  assert.match(
+    source,
+    /await enforceSpotifyPlaylistPrivacy\(playlist\.id, isPublic, spotifyClientId\)/,
+  );
 });
 
 test("setlist search validates input without calling the upstream API", async () => {
