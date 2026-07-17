@@ -29,12 +29,13 @@ test("server-renders the Encore app shell", async () => {
   assert.equal(response.status, 200);
   const html = await response.text();
   assert.match(html, /<title>Encore — Setlist to Spotify<\/title>/i);
-  assert.match(html, /Keep the encore/);
+  assert.match(html, /<h1 id="hero-title">Setlist to Playlist<\/h1>/);
   assert.match(html, /Find setlists/);
   assert.match(html, />Artist</);
   assert.match(html, />City</);
   assert.match(html, />Year</);
   assert.match(html, /Connect Spotify/);
+  assert.doesNotMatch(html, /<nav|ENCORE<span>|Setlist\.fm → Spotify/);
   assert.match(
     html,
     /Created by <a href="https:\/\/krynsky\.com\/">Mark Krynsky<\/a>/,

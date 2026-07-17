@@ -20,11 +20,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
 main { min-height: 100vh; overflow: hidden; background: radial-gradient(ellipse 90% 36% at 58% 0%, #2c426b 0%, var(--ink) 70%); }
-.nav { max-width: 1220px; height: 74px; padding: 0 28px; margin: auto; display: flex; align-items: center; gap: 22px; border-bottom: 1px solid rgb(244 241 233 / 13%); }
-.brand { color: var(--paper); font: 600 19px var(--font-geist-mono); letter-spacing: .16em; text-decoration: none; }
-.brand span { color: var(--acid); margin-left: 4px; }
-.nav p { flex: 1; margin: 0; color: #8d9bb6; font: 12px var(--font-geist-mono); }
-.spotify-button { display: flex; align-items: center; gap: 8px; padding: 9px 12px; color: var(--acid); background: transparent; border: 1px solid #647250; border-radius: 3px; font-size: 12px; font-weight: 650; }
+.spotify-button { display: flex; align-items: center; gap: 8px; margin: 18px auto 0; padding: 9px 12px; color: var(--acid); background: transparent; border: 1px solid #647250; border-radius: 3px; font-size: 12px; font-weight: 650; }
 .spotify-button span { font-size: 10px; }
 
 .hero { max-width: 1000px; margin: auto; padding: 84px 28px 78px; text-align: center; }
@@ -92,9 +88,6 @@ footer { padding: 25px; color: #71809c; border-top: 1px solid #263653; text-alig
 .creator-credit a:hover { color: #fff; }
 
 @media (max-width: 760px) {
-  .nav { padding: 0 18px; }
-  .nav p { display: none; }
-  .brand { flex: 1; }
   .hero { padding: 60px 20px 54px; }
   .search { max-width: 590px; }
   .workspace { grid-template-columns: 1fr; margin: 0 16px 35px; }

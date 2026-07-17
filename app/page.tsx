@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 
 type SetlistSong = {
   name: string;
@@ -425,24 +424,9 @@ export default function Home() {
 
   return (
     <main>
-      <nav className="nav" aria-label="Main navigation">
-        <Link className="brand" href="/" aria-label="Encore home">
-          ENCORE<span>✦</span>
-        </Link>
-        <p>Setlist.fm → Spotify</p>
-        <button className="spotify-button" onClick={connectOrDisconnect}>
-          <span aria-hidden="true">●</span>
-          {connected ? "Spotify connected" : "Connect Spotify"}
-        </button>
-      </nav>
-
       <section className="hero" aria-labelledby="hero-title">
         <p className="eyebrow">FROM THE STAGE TO YOUR LIBRARY</p>
-        <h1 id="hero-title">
-          Keep the encore
-          <br />
-          <em>playing.</em>
-        </h1>
+        <h1 id="hero-title">Setlist to Playlist</h1>
         <p className="intro">
           Find any show on Setlist.fm and turn the night&apos;s songs into a
           Spotify playlist, in the order they were played.
@@ -486,6 +470,10 @@ export default function Home() {
             {busy ? "Working…" : "Find setlists"} <span>→</span>
           </button>
         </form>
+        <button className="spotify-button" onClick={connectOrDisconnect}>
+          <span aria-hidden="true">●</span>
+          {connected ? "Spotify connected" : "Connect Spotify"}
+        </button>
         <p className="helper">Use any combination of artist, city, and year</p>
       </section>
 
