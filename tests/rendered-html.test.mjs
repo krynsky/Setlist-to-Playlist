@@ -38,20 +38,21 @@ test("server-renders the Encore app shell", async () => {
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/);
 });
 
-test("playlist creation explicitly enforces and verifies the selected privacy", async () => {
+test("playlist creation adds songs before applying the selected visibility", async () => {
   const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
   assert.match(
     source,
     /spotifyRequest\(`\/playlists\/\$\{playlistId\}`,\s*\{\s*method: "PUT",\s*body: JSON\.stringify\(\{ public: isPublic \}\)/s,
   );
-  assert.match(
-    source,
-    /confirmedPlaylist\?\.public !== isPublic/,
+  const addSongs = source.indexOf("for (let index = 0; index < uris.length; index += 100)");
+  const applyVisibility = source.indexOf(
+    "await applySpotifyPlaylistVisibility(playlist.id, isPublic, spotifyClientId)",
   );
-  assert.match(
-    source,
-    /await enforceSpotifyPlaylistPrivacy\(playlist\.id, isPublic, spotifyClientId\)/,
-  );
+  assert.notEqual(addSongs, -1);
+  assert.notEqual(applyVisibility, -1);
+  assert.ok(addSongs < applyVisibility);
+  assert.doesNotMatch(source, /confirmedPlaylist\?\.public !== isPublic/);
+  assert.match(source, /Spotify added the songs but could not apply the visibility setting/);
 });
 
 test("setlist search validates input without calling the upstream API", async () => {

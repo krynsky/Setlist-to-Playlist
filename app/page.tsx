@@ -210,7 +210,7 @@ async function findSpotifyTrack(
   return result.tracks?.items?.[0] ?? null;
 }
 
-async function enforceSpotifyPlaylistPrivacy(
+async function applySpotifyPlaylistVisibility(
   playlistId: string,
   isPublic: boolean,
   clientId: string | null,
@@ -219,17 +219,6 @@ async function enforceSpotifyPlaylistPrivacy(
     method: "PUT",
     body: JSON.stringify({ public: isPublic }),
   }, clientId);
-
-  const confirmedPlaylist = await spotifyRequest(
-    `/playlists/${playlistId}`,
-    {},
-    clientId,
-  );
-  if (confirmedPlaylist?.public !== isPublic) {
-    throw new Error(
-      `Spotify did not confirm that the playlist is ${isPublic ? "public" : "private"}.`,
-    );
-  }
 }
 
 export default function Home() {
@@ -249,6 +238,7 @@ export default function Home() {
     added: number;
     unmatched: string[];
     isPublic: boolean;
+    visibilityWarning: string;
   } | null>(null);
 
   const songs = useMemo(
@@ -390,9 +380,6 @@ export default function Home() {
         }),
       }, spotifyClientId);
 
-      setStatus(`Confirming the playlist is ${isPublic ? "public" : "private"}…`);
-      await enforceSpotifyPlaylistPrivacy(playlist.id, isPublic, spotifyClientId);
-
       for (let index = 0; index < uris.length; index += 100) {
         await spotifyRequest(`/playlists/${playlist.id}/items`, {
           method: "POST",
@@ -400,13 +387,25 @@ export default function Home() {
         }, spotifyClientId);
       }
 
+      let visibilityWarning = "";
+      setStatus(`Applying ${isPublic ? "public" : "private"} playlist visibility…`);
+      try {
+        await applySpotifyPlaylistVisibility(playlist.id, isPublic, spotifyClientId);
+      } catch {
+        visibilityWarning =
+          "Spotify added the songs but could not apply the visibility setting. You can change it in Spotify.";
+      }
+
       setSuccess({
         url: playlist.external_urls.spotify,
         added: uris.length,
         unmatched,
         isPublic,
+        visibilityWarning,
       });
-      setStatus(`${isPublic ? "Public" : "Private"} playlist created.`);
+      setStatus(
+        visibilityWarning || `${isPublic ? "Public" : "Private"} playlist created.`,
+      );
     } catch (error) {
       setConnected(hasSpotifySession());
       setStatus(error instanceof Error ? error.message : "Playlist creation failed.");
@@ -601,6 +600,7 @@ export default function Home() {
               {success.unmatched.length
                 ? ` · ${success.unmatched.length} unmatched: ${success.unmatched.join(", ")}`
                 : ""}
+              {success.visibilityWarning ? ` · ${success.visibilityWarning}` : ""}
             </p>
           </div>
           <a href={success.url} target="_blank" rel="noreferrer">
