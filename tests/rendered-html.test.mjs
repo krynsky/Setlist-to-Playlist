@@ -30,6 +30,9 @@ test("server-renders the Encore app shell", async () => {
   assert.match(html, /<title>Encore — Setlist to Spotify<\/title>/i);
   assert.match(html, /Keep the encore/);
   assert.match(html, /Find setlists/);
+  assert.match(html, />Artist</);
+  assert.match(html, />City</);
+  assert.match(html, />Year</);
   assert.match(html, /Connect Spotify/);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/);
 });
@@ -37,7 +40,13 @@ test("server-renders the Encore app shell", async () => {
 test("setlist search validates input without calling the upstream API", async () => {
   const response = await request("/api/setlists");
   assert.equal(response.status, 400);
-  assert.deepEqual(await response.json(), { error: "Enter an artist or band name." });
+  assert.deepEqual(await response.json(), { error: "Enter an artist, city, or year." });
+});
+
+test("setlist search rejects an invalid year", async () => {
+  const response = await request("/api/setlists?year=26");
+  assert.equal(response.status, 400);
+  assert.deepEqual(await response.json(), { error: "Year must contain four digits." });
 });
 
 test("setlist search reports missing server configuration safely", async () => {
@@ -70,13 +79,17 @@ test("setlist search authenticates upstream and returns setlists", async () => {
   };
 
   try {
-    const response = await request("/api/setlists?artistName=Radiohead");
+    const response = await request(
+      "/api/setlists?artistName=Radiohead&cityName=Los%20Angeles&year=2024",
+    );
     assert.equal(response.status, 200);
     assert.deepEqual(await response.json(), { setlists: [upstreamSetlist] });
     const upstreamUrl = new URL(capturedRequest.input);
     assert.equal(upstreamUrl.origin, "https://api.setlist.fm");
     assert.equal(upstreamUrl.pathname, "/rest/1.0/search/setlists");
     assert.equal(upstreamUrl.searchParams.get("artistName"), "Radiohead");
+    assert.equal(upstreamUrl.searchParams.get("cityName"), "Los Angeles");
+    assert.equal(upstreamUrl.searchParams.get("year"), "2024");
     assert.equal(capturedRequest.init.headers["x-api-key"], "test-setlist-key");
     assert.equal(capturedRequest.init.headers.Accept, "application/json");
   } finally {

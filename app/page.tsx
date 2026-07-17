@@ -211,7 +211,9 @@ async function findSpotifyTrack(
 }
 
 export default function Home() {
-  const [query, setQuery] = useState("");
+  const [artist, setArtist] = useState("");
+  const [city, setCity] = useState("");
+  const [year, setYear] = useState("");
   const [results, setResults] = useState<Setlist[]>([]);
   const [selected, setSelected] = useState<Setlist | null>(null);
   const [included, setIncluded] = useState<Set<string>>(new Set());
@@ -272,21 +274,36 @@ export default function Home() {
 
   async function searchSetlists(event: FormEvent) {
     event.preventDefault();
-    const artistName = query.trim();
-    if (!artistName) return;
+    const search = {
+      artistName: artist.trim(),
+      cityName: city.trim(),
+      year: year.trim(),
+    };
+    if (!search.artistName && !search.cityName && !search.year) {
+      setStatus("Enter an artist, city, or year to search.");
+      return;
+    }
+    if (search.year && !/^\d{4}$/.test(search.year)) {
+      setStatus("Enter the year as four digits, such as 2024.");
+      return;
+    }
     setBusy(true);
     setSelected(null);
     setSuccess(null);
     setStatus("Looking for shows…");
     try {
-      const response = await fetch(`/api/setlists?artistName=${encodeURIComponent(artistName)}`);
+      const params = new URLSearchParams();
+      Object.entries(search).forEach(([key, value]) => {
+        if (value) params.set(key, value);
+      });
+      const response = await fetch(`/api/setlists?${params}`);
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Setlist search failed.");
       setResults(data.setlists);
       setStatus(
         data.setlists.length
           ? `${data.setlists.length} shows found.`
-          : "No shows found. Try another artist name.",
+          : "No shows found. Try broadening your search.",
       );
     } catch (error) {
       setResults([]);
@@ -396,21 +413,45 @@ export default function Home() {
           Spotify playlist, in the order they were played.
         </p>
         <form className="search" onSubmit={searchSetlists}>
-          <label className="sr-only" htmlFor="artist-search">
-            Artist or band name
-          </label>
-          <input
-            id="artist-search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search an artist or band"
-            autoComplete="off"
-          />
+          <div className="search-fields">
+            <label className="search-field" htmlFor="artist-search">
+              <span>Artist</span>
+              <input
+                id="artist-search"
+                value={artist}
+                onChange={(event) => setArtist(event.target.value)}
+                placeholder="Radiohead"
+                autoComplete="off"
+              />
+            </label>
+            <label className="search-field" htmlFor="city-search">
+              <span>City</span>
+              <input
+                id="city-search"
+                value={city}
+                onChange={(event) => setCity(event.target.value)}
+                placeholder="Los Angeles"
+                autoComplete="address-level2"
+              />
+            </label>
+            <label className="search-field year-field" htmlFor="year-search">
+              <span>Year</span>
+              <input
+                id="year-search"
+                value={year}
+                onChange={(event) => setYear(event.target.value)}
+                placeholder="2024"
+                inputMode="numeric"
+                pattern="[0-9]{4}"
+                maxLength={4}
+              />
+            </label>
+          </div>
           <button disabled={busy} type="submit">
             {busy ? "Working…" : "Find setlists"} <span>→</span>
           </button>
         </form>
-        <p className="helper">Try “Radiohead”, “Beyoncé”, or “The Cure”</p>
+        <p className="helper">Use any combination of artist, city, and year</p>
       </section>
 
       <section className="workspace" aria-label="Setlist playlist builder">

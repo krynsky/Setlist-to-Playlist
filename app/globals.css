@@ -32,8 +32,11 @@ main { min-height: 100vh; overflow: hidden; background: radial-gradient(ellipse 
 h1 { margin: 0; font: 700 clamp(50px, 8vw, 94px)/.96 Georgia, "Times New Roman", serif; letter-spacing: -.055em; }
 h1 em { color: var(--acid); }
 .intro { max-width: 535px; margin: 24px auto 29px; color: #b6c1d3; font-size: 17px; line-height: 1.55; }
-.search { display: flex; max-width: 590px; margin: auto; padding: 5px; background: var(--paper); border-radius: 4px; box-shadow: 0 16px 45px rgb(3 8 19 / 65%); }
-.search input { min-width: 0; flex: 1; padding: 13px 15px; color: #17213b; background: transparent; border: 0; outline: 0; font-size: 15px; }
+.search { display: flex; max-width: 820px; margin: auto; padding: 5px; background: var(--paper); border-radius: 4px; box-shadow: 0 16px 45px rgb(3 8 19 / 65%); }
+.search-fields { display: grid; grid-template-columns: 1.25fr 1fr .55fr; min-width: 0; flex: 1; }
+.search-field { display: flex; min-width: 0; flex-direction: column; align-items: flex-start; justify-content: center; padding: 7px 14px; border-right: 1px solid #d5d1c8; text-align: left; }
+.search-field span { color: #6e7480; font: 9px var(--font-geist-mono); font-weight: 650; letter-spacing: .12em; text-transform: uppercase; }
+.search input { width: 100%; min-width: 0; padding: 3px 0 0; color: #17213b; background: transparent; border: 0; outline: 0; font-size: 15px; }
 .search input::placeholder { color: #7e8795; }
 .search button, .create-button { padding: 12px 18px; color: white; background: var(--coral); border: 0; border-radius: 2px; font-size: 14px; font-weight: 700; }
 .search button span { margin-left: 8px; font-size: 19px; }
@@ -90,6 +93,7 @@ footer { padding: 25px; color: #71809c; border-top: 1px solid #263653; text-alig
   .nav p { display: none; }
   .brand { flex: 1; }
   .hero { padding: 60px 20px 54px; }
+  .search { max-width: 590px; }
   .workspace { grid-template-columns: 1fr; margin: 0 16px 35px; }
   .results-panel { border-right: 0; border-bottom: 1px solid var(--line); }
   .results-panel, .playlist-panel { padding: 22px 18px; }
@@ -102,8 +106,12 @@ footer { padding: 25px; color: #71809c; border-top: 1px solid #263653; text-alig
 @media (max-width: 480px) {
   .spotify-button { padding: 9px; }
   .spotify-button span { display: none; }
-  .search input { padding-left: 9px; }
-  .search button { padding: 10px; }
+  .search { flex-direction: column; padding: 6px; }
+  .search-fields { grid-template-columns: 1fr 1fr; }
+  .search-field { border-bottom: 1px solid #d5d1c8; }
+  .search-field:nth-child(2) { border-right: 0; }
+  .search-field.year-field { grid-column: 1 / -1; border-right: 0; }
+  .search button { margin-top: 6px; padding: 10px; }
   .selected-show { flex-direction: column; }
   .selected-show a { align-self: flex-start; }
 }

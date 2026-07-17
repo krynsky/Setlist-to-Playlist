@@ -4,8 +4,19 @@ const SETLIST_API = "https://api.setlist.fm/rest/1.0/search/setlists";
 
 export async function GET(request: NextRequest) {
   const artistName = request.nextUrl.searchParams.get("artistName")?.trim();
-  if (!artistName) {
-    return NextResponse.json({ error: "Enter an artist or band name." }, { status: 400 });
+  const cityName = request.nextUrl.searchParams.get("cityName")?.trim();
+  const year = request.nextUrl.searchParams.get("year")?.trim();
+  if (!artistName && !cityName && !year) {
+    return NextResponse.json(
+      { error: "Enter an artist, city, or year." },
+      { status: 400 },
+    );
+  }
+  if (year && !/^\d{4}$/.test(year)) {
+    return NextResponse.json(
+      { error: "Year must contain four digits." },
+      { status: 400 },
+    );
   }
 
   const apiKey = process.env.SETLIST_FM_API_KEY;
@@ -17,7 +28,9 @@ export async function GET(request: NextRequest) {
   }
 
   const url = new URL(SETLIST_API);
-  url.searchParams.set("artistName", artistName);
+  if (artistName) url.searchParams.set("artistName", artistName);
+  if (cityName) url.searchParams.set("cityName", cityName);
+  if (year) url.searchParams.set("year", year);
   url.searchParams.set("p", "1");
 
   try {
