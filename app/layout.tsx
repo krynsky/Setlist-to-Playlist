@@ -31,6 +31,14 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         {children}
+        <script
+          async
+          type="module"
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon={JSON.stringify({
+            token: "23d87901b7964d91ad6ec73c3d13453f",
+          })}
+        />
       </body>
     </html>
   );

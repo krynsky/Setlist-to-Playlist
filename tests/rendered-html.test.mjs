@@ -38,6 +38,11 @@ test("server-renders the Encore app shell", async () => {
   assert.doesNotMatch(html, /<nav|ENCORE<span>|Setlist\.fm → Spotify/);
   assert.match(
     html,
+    /src="https:\/\/static\.cloudflareinsights\.com\/beacon\.min\.js"/,
+  );
+  assert.match(html, /23d87901b7964d91ad6ec73c3d13453f/);
+  assert.match(
+    html,
     /Created by <a href="https:\/\/krynsky\.com\/">Mark Krynsky<\/a>/,
   );
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/);
