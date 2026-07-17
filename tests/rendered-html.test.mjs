@@ -55,6 +55,20 @@ test("playlist creation adds songs before applying the selected visibility", asy
   assert.match(source, /Spotify added the songs but could not apply the visibility setting/);
 });
 
+test("setlist titles put city and venue before the date", async () => {
+  const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  assert.match(
+    source,
+    /const location = \[setlist\.venue\?\.city\?\.name, setlist\.venue\?\.name\]/,
+  );
+  assert.match(
+    source,
+    /return \[setlist\.artist\.name, location, formatDate\(setlist\.eventDate\)\]/,
+  );
+  assert.match(source, /name: setlistTitle\(selected\)/);
+  assert.match(source, /<h3>\{setlistTitle\(selected\)\}<\/h3>/);
+});
+
 test("setlist search validates input without calling the upstream API", async () => {
   const response = await request("/api/setlists");
   assert.equal(response.status, 400);

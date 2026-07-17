@@ -64,6 +64,15 @@ function venueLabel(setlist: Setlist) {
     .join(" · ");
 }
 
+function setlistTitle(setlist: Setlist) {
+  const location = [setlist.venue?.city?.name, setlist.venue?.name]
+    .filter(Boolean)
+    .join(" · ");
+  return [setlist.artist.name, location, formatDate(setlist.eventDate)]
+    .filter(Boolean)
+    .join(" — ");
+}
+
 function songsFromSetlist(setlist: Setlist): Song[] {
   return (setlist.sets?.set ?? []).flatMap((set, setIndex) =>
     (set.song ?? []).map((song, songIndex) => ({
@@ -374,7 +383,7 @@ export default function Home() {
       const playlist = await spotifyRequest("/me/playlists", {
         method: "POST",
         body: JSON.stringify({
-          name: `${selected.artist.name} — ${formatDate(selected.eventDate)}`,
+          name: setlistTitle(selected),
           description: `Setlist from ${venueLabel(selected)}. Created with Encore.`,
           public: isPublic,
         }),
@@ -529,9 +538,8 @@ export default function Home() {
             <>
               <header className="selected-show">
                 <div>
-                  <p className="eyebrow">{formatDate(selected.eventDate)}</p>
-                  <h3>{selected.artist.name}</h3>
-                  <p>{venueLabel(selected)}</p>
+                  <p className="eyebrow">Selected setlist</p>
+                  <h3>{setlistTitle(selected)}</h3>
                 </div>
                 <a href={selected.url} target="_blank" rel="noreferrer">
                   View setlist ↗
