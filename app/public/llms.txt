@@ -1,0 +1,25 @@
+# Setlist to Playlist
+
+> A free web app that turns concert setlists from Setlist.fm into Spotify playlists in the order the songs were played.
+
+## What it does
+
+- Search concert setlists by artist, city, and year.
+- Review the songs, including covers and encores, before creating a playlist.
+- Sign in to Spotify with Authorization Code with PKCE and create a playlist in the visitor's own Spotify account.
+- New playlists are private by default; the visitor can choose to make one public.
+
+## Important facts
+
+- Website: https://setlist-to-playlist.krynsky.com/
+- Source code: https://github.com/krynsky/Setlist-to-Playlist
+- Creator: Mark Krynsky (https://krynsky.com/)
+- Data source: Setlist.fm
+- Playlist service: Spotify
+- Cost: Free and open source; visitors provide their own Setlist.fm API key and Spotify Client ID when running a local or Pinokio installation.
+
+## Privacy
+
+- The hosted demo uses Spotify's browser-based PKCE sign-in flow; Spotify credentials are not stored by this app.
+- Spotify access and refresh tokens remain in the visitor's browser for their session.
+- Locally installed and Pinokio versions use credentials supplied by the person running the app.

@@ -42,6 +42,28 @@ test("the site and Pinokio launcher share the same favicon artwork", async () =>
   assert.equal(siteIcon, launcherIcon);
 });
 
+test("the demo exposes complete discovery metadata and a social share image", async () => {
+  const [layout, ogImage, robots, sitemap, llms] = await Promise.all([
+    readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/opengraph-image.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/robots.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/sitemap.ts", import.meta.url), "utf8"),
+    readFile(new URL("../public/llms.txt", import.meta.url), "utf8"),
+  ]);
+  assert.match(layout, /metadataBase: new URL\(siteUrl\)/);
+  assert.match(layout, /openGraph:/);
+  assert.match(layout, /twitter:/);
+  assert.match(layout, /application\/ld\+json/);
+  assert.match(layout, /"@type": "WebApplication"/);
+  assert.match(ogImage, /ImageResponse/);
+  assert.match(ogImage, /width: 1200/);
+  assert.match(ogImage, /height: 630/);
+  assert.match(robots, /sitemap/);
+  assert.match(sitemap, /setlist-to-playlist\.krynsky\.com/);
+  assert.match(llms, /Spotify playlists/);
+  assert.doesNotMatch(llms, /SETLIST_FM_API_KEY=|SPOTIFY_CLIENT_ID=/);
+});
+
 test("recent setlists are optional and limited to nine shared entries", async () => {
   const [page, route, storage] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
