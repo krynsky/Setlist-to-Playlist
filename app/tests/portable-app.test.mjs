@@ -89,6 +89,7 @@ test("local Spotify authorization reconnects the Pinokio Web UI after browser si
   ]);
   assert.match(config, /localSpotifyAuth/);
   assert.match(authorize, /\/api\/spotify\/callback/);
+  assert.match(authorize, /http:\/\/127\.0\.0\.1/);
   assert.match(authorize, /savePendingSpotifyAuth/);
   assert.match(callback, /saveLocalSpotifySession/);
   assert.match(session, /refresh_token/);
@@ -97,6 +98,7 @@ test("local Spotify authorization reconnects the Pinokio Web UI after browser si
   assert.match(page, /Finish connecting Spotify in the browser/);
   assert.match(page, /Local settings/);
   assert.match(settings, /\/api\/spotify\/callback/);
+  assert.match(settings, /http:\/\/127\.0\.0\.1/);
   assert.match(gitignore, /^\.spotify-\*\.json$/m);
 });
 

@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
   const clientId = process.env.SPOTIFY_CLIENT_ID;
   if (!clientId) return new NextResponse("Spotify is not configured yet.", { status: 503 });
 
-  const redirectUri = new URL("/api/spotify/callback", request.nextUrl.origin).toString();
+  const redirectUri = new URL("/api/spotify/callback", `http://127.0.0.1:${request.nextUrl.port}`).toString();
   const authorization = createSpotifyAuthorization(redirectUri);
   await savePendingSpotifyAuth({
     state: authorization.state,
