@@ -65,7 +65,7 @@ Every installation needs its own API credentials.
    - Pinokio: the localhost URL shown by Pinokio after you start the app
    - Your own deployment: your public app URL, ending in `/`
 
-4. Copy [`app/.env.example`](app/.env.example) to `app/.env.local` and add your values:
+4. After starting a local or Pinokio installation, open **Local settings** at `/settings` to enter both values. The page writes them to `app/.env.local`, then asks you to restart the app. You can also create the file manually:
 
    ```env
    SETLIST_FM_API_KEY=your_setlist_fm_key
@@ -90,16 +90,13 @@ Every installation needs its own API credentials.
 git clone https://github.com/krynsky/Setlist-to-Playlist.git
 cd Setlist-to-Playlist
 
-# Configure your credentials
-cp app/.env.example app/.env.local
-
 # Install and start the app
 cd app
 npm ci
 npm run dev
 ```
 
-Open `http://localhost:3000/`, then connect Spotify and search for a show.
+Open `http://localhost:3000/`. On first launch, use the local setup banner to open **Local settings**, enter your credentials, and restart the app. Then connect Spotify and search for a show.
 
 On Windows PowerShell, use this copy command instead:
 
@@ -115,8 +112,9 @@ This repository includes a one-click [Pinokio](https://desktop.pinokio.co/docs/#
 
 1. Clone the repository into `PINOKIO_HOME/api/setlist-to-playlist`.
 2. Open **Setlist to Playlist** in Pinokio and choose **Install**.
-3. Add your two values to `app/.env.local`.
-4. Choose **Start** and add the exact localhost URL Pinokio shows you as a Redirect URI in your Spotify app.
+3. Choose **Start**, then open **Settings & API keys**.
+4. Add your two values and the exact redirect URI shown by the settings page to your Spotify app.
+5. Restart the app in Pinokio, then choose **Open Web UI**.
 
 The launcher also includes **Update** and **Reset** actions.
 

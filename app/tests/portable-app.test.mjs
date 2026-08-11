@@ -17,7 +17,7 @@ test("the portable app requires user-owned credentials and keeps demo analytics 
   assert.match(env, /^SPOTIFY_CLIENT_ID=$/m);
   assert.match(route, /process\.env\.SETLIST_FM_API_KEY/);
   assert.match(route, /"x-api-key": apiKey/);
-  assert.doesNotMatch(config, /SETLIST_FM_API_KEY/);
+  assert.doesNotMatch(config, /setlistFmApiKey:/);
 });
 
 test("the UI still creates a playlist with the requested visibility after tracks are added", async () => {
@@ -52,6 +52,28 @@ test("the Pinokio launcher captures its localhost URL and opens it inside Pinoki
   assert.match(launcher, /text: "Open Web UI"/);
   assert.match(launcher, /href: local\.url/);
   assert.doesNotMatch(launcher, /target: "_blank"/);
+});
+
+test("local settings are loopback-only and save credentials without exposing them", async () => {
+  const [page, form, route, config, home, launcher] = await Promise.all([
+    readFile(new URL("../app/settings/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/settings/settings-form.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/api/settings/route.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/api/config/route.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../../pinokio.js", import.meta.url), "utf8"),
+  ]);
+  assert.match(page, /isLoopbackHost/);
+  assert.match(route, /isLocalRequest/);
+  assert.match(route, /status: 404/);
+  assert.match(route, /writeFile\(environmentFile/);
+  assert.match(route, /SETLIST_FM_API_KEY/);
+  assert.match(route, /SPOTIFY_CLIENT_ID/);
+  assert.doesNotMatch(route, /setlistFmApiKey: setlistFmApiKey/);
+  assert.match(config, /settingsAvailable/);
+  assert.match(home, /Open local settings/);
+  assert.match(form, /Restart the app/);
+  assert.match(launcher, /Settings & API keys/);
 });
 
 test("the demo exposes complete discovery metadata and a social share image", async () => {

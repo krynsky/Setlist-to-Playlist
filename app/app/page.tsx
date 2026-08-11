@@ -244,6 +244,7 @@ export default function Home() {
   const [included, setIncluded] = useState<Set<string>>(new Set());
   const [connected, setConnected] = useState(false);
   const [spotifyClientId, setSpotifyClientId] = useState<string | null>(null);
+  const [setupRequired, setSetupRequired] = useState(false);
   const [isPublic, setIsPublic] = useState(false);
   const [recentSetlists, setRecentSetlists] = useState<RecentSetlist[]>([]);
   const [busy, setBusy] = useState(false);
@@ -267,6 +268,7 @@ export default function Home() {
       const config = await configResponse.json();
       const clientId = config.spotifyClientId || null;
       setSpotifyClientId(clientId);
+      setSetupRequired(Boolean(config.settingsAvailable && !config.isConfigured));
       setConnected(hasSpotifySession());
       const params = new URLSearchParams(window.location.search);
       const code = params.get("code");
@@ -520,6 +522,17 @@ export default function Home() {
           />
         </a>
       </section>
+
+      {setupRequired && (
+        <section className="setup-banner" aria-labelledby="setup-banner-title">
+          <div>
+            <p className="eyebrow">FIRST-TIME SETUP</p>
+            <h2 id="setup-banner-title">Add your Setlist.fm API key and Spotify Client ID</h2>
+            <p>Setlist to Playlist needs your own credentials before it can search shows or connect Spotify.</p>
+          </div>
+          <a href="/settings">Open local settings →</a>
+        </section>
+      )}
 
       <section className="workspace" aria-label="Setlist playlist builder">
         <div className="results-panel">
