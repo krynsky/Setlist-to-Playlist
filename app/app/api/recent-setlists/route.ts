@@ -79,7 +79,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Could not update recent setlists." }, { status: 400 });
     }
     return NextResponse.json({ entries });
-  } catch {
+  } catch (error) {
+    console.error("Recent setlist update failed", error);
     return NextResponse.json(
       { error: "Could not update recent setlists." },
       { status: 502 },
