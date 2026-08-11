@@ -38,6 +38,8 @@ h1 em { color: var(--acid); }
 .search button span { margin-left: 8px; font-size: 19px; }
 .search button:disabled, .create-button:disabled { cursor: not-allowed; opacity: .55; }
 .helper { margin: 13px 0 0; color: #73829d; font: 11px var(--font-geist-mono); }
+.coffee-button { display: inline-block; margin-top: 16px; line-height: 0; }
+.coffee-button img { display: block; width: 150px; height: auto; }
 
 .workspace { display: grid; grid-template-columns: .9fr 1.1fr; max-width: 1165px; min-height: 465px; margin: 0 auto 40px; background: var(--ink-soft); border: 1px solid var(--line); box-shadow: 0 30px 80px rgb(0 0 0 / 35%); }
 .results-panel, .playlist-panel { min-width: 0; padding: 27px 28px; }

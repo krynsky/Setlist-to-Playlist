@@ -475,6 +475,21 @@ export default function Home() {
           {connected ? "Spotify connected" : "Connect Spotify"}
         </button>
         <p className="helper">Use any combination of artist, city, and year</p>
+        <a
+          className="coffee-button"
+          href="https://www.buymeacoffee.com/krynsky"
+          target="_blank"
+          rel="noreferrer"
+        >
+          {/* The hosted button is shared with the project README. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
+            alt="Buy Me A Coffee"
+            width={150}
+            height={42}
+          />
+        </a>
       </section>
 
       <section className="workspace" aria-label="Setlist playlist builder">
