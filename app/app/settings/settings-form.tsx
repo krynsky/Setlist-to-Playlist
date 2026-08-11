@@ -59,7 +59,7 @@ export function SettingsForm() {
           Create a <a href="https://developer.spotify.com/dashboard" target="_blank" rel="noreferrer">Spotify app</a>, then copy its Client ID. No Spotify client secret is needed.
         </li>
         <li>
-          In your Spotify app, add this exact Redirect URI: <code>{redirectUri || "http://localhost:3000/"}</code>
+          In your Spotify app, add this exact Redirect URI: <code>{redirectUri || "http://localhost:3000/api/spotify/callback"}</code>
         </li>
       </ol>
 
