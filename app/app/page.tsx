@@ -38,6 +38,12 @@ type SpotifyTrack = {
   artists: { name: string }[];
 };
 
+type RecentSetlist = {
+  title: string;
+  url: string;
+  createdAt: string;
+};
+
 const TOKEN_KEY = "encore.spotify.token";
 const REFRESH_KEY = "encore.spotify.refresh";
 const EXPIRES_KEY = "encore.spotify.expires";
@@ -239,6 +245,7 @@ export default function Home() {
   const [connected, setConnected] = useState(false);
   const [spotifyClientId, setSpotifyClientId] = useState<string | null>(null);
   const [isPublic, setIsPublic] = useState(false);
+  const [recentSetlists, setRecentSetlists] = useState<RecentSetlist[]>([]);
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState("");
   const [success, setSuccess] = useState<{
@@ -283,6 +290,13 @@ export default function Home() {
       }
     }
     void initializeSpotify();
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/recent-setlists")
+      .then((response) => response.json())
+      .then((data) => setRecentSetlists(data.entries ?? []))
+      .catch(() => setRecentSetlists([]));
   }, []);
 
   function chooseSetlist(setlist: Setlist) {
@@ -414,6 +428,16 @@ export default function Home() {
       setStatus(
         visibilityWarning || `${isPublic ? "Public" : "Private"} playlist created.`,
       );
+      void fetch("/api/recent-setlists", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          setlistId: selected.id,
+        }),
+      })
+        .then((response) => response.json())
+        .then((data) => setRecentSetlists(data.entries ?? []))
+        .catch(() => undefined);
     } catch (error) {
       setConnected(hasSpotifySession());
       setStatus(error instanceof Error ? error.message : "Playlist creation failed.");
@@ -596,6 +620,28 @@ export default function Home() {
           )}
         </div>
       </section>
+
+      {recentSetlists.length > 0 && (
+        <section className="recent-setlists" aria-labelledby="recent-setlists-title">
+          <div className="section-title">
+            <span>03</span>
+            <h2 id="recent-setlists-title">Recently turned into playlists</h2>
+          </div>
+          <div className="recent-setlist-grid">
+            {recentSetlists.map((setlist) => (
+              <a href={setlist.url} key={setlist.url} target="_blank" rel="noreferrer">
+                <span>Setlist.fm</span>
+                <strong>{setlist.title}</strong>
+                <small>
+                  {new Intl.DateTimeFormat(undefined, {
+                    dateStyle: "medium",
+                  }).format(new Date(setlist.createdAt))}
+                </small>
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
 
       <div className="status" role="status" aria-live="polite">
         {status || "Ready to find a show."}

@@ -42,6 +42,14 @@ h1 em { color: var(--acid); }
 .coffee-button img { display: block; width: 150px; height: auto; }
 
 .workspace { display: grid; grid-template-columns: .9fr 1.1fr; max-width: 1165px; min-height: 465px; margin: 0 auto 40px; background: var(--ink-soft); border: 1px solid var(--line); box-shadow: 0 30px 80px rgb(0 0 0 / 35%); }
+.recent-setlists { max-width: 1165px; margin: 0 auto 40px; padding: 0 28px; }
+.recent-setlists .section-title { margin-bottom: 14px; }
+.recent-setlist-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.recent-setlist-grid a { display: flex; min-height: 122px; flex-direction: column; gap: 9px; padding: 17px; color: var(--paper); background: var(--ink-soft); border: 1px solid var(--line); text-decoration: none; }
+.recent-setlist-grid a:hover { background: #243758; border-color: #657252; }
+.recent-setlist-grid span { color: var(--acid); font: 10px var(--font-geist-mono); letter-spacing: .1em; text-transform: uppercase; }
+.recent-setlist-grid strong { flex: 1; font-size: 14px; line-height: 1.35; }
+.recent-setlist-grid small { color: #91a0ba; font: 10px var(--font-geist-mono); }
 .results-panel, .playlist-panel { min-width: 0; padding: 27px 28px; }
 .results-panel { border-right: 1px solid var(--line); }
 .section-title { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
@@ -96,6 +104,8 @@ footer { display: flex; align-items: center; justify-content: center; gap: 13px;
   .hero { padding: 60px 20px 34px; }
   .search { max-width: 590px; }
   .workspace { grid-template-columns: 1fr; margin: 0 16px 35px; }
+  .recent-setlists { margin-bottom: 35px; padding: 0 16px; }
+  .recent-setlist-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .results-panel { border-right: 0; border-bottom: 1px solid var(--line); }
   .results-panel, .playlist-panel { padding: 22px 18px; }
   .empty-state { min-height: 160px; }
@@ -113,6 +123,7 @@ footer { display: flex; align-items: center; justify-content: center; gap: 13px;
   .search-field:nth-child(2) { border-right: 0; }
   .search-field.year-field { grid-column: 1 / -1; border-right: 0; }
   .search button { margin-top: 6px; padding: 10px; }
+  .recent-setlist-grid { grid-template-columns: 1fr; }
   .selected-show { flex-direction: column; }
   .selected-show a { align-self: flex-start; }
   footer { flex-direction: column; gap: 10px; }

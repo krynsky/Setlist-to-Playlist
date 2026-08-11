@@ -24,3 +24,17 @@ test("the UI still creates a playlist with the requested visibility after tracks
   assert.ok(addSongs >= 0 && addSongs < applyVisibility);
   assert.match(source, /name: setlistTitle\(selected\)/);
 });
+
+test("recent setlists are optional and limited to nine shared entries", async () => {
+  const [page, route, storage] = await Promise.all([
+    readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/api/recent-setlists/route.ts", import.meta.url), "utf8"),
+    readFile(new URL("../lib/recent-setlists.ts", import.meta.url), "utf8"),
+  ]);
+  assert.match(page, /Recently turned into playlists/);
+  assert.match(route, /isRecentSetlistsEnabled/);
+  assert.match(route, /SETLIST_FM_API_KEY/);
+  assert.match(route, /setlistId/);
+  assert.match(storage, /const MAX_RECENT_SETLISTS = 9/);
+  assert.match(storage, /process\.env\.BLOB_READ_WRITE_TOKEN/);
+});
