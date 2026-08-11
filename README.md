@@ -59,11 +59,11 @@ Every installation needs its own API credentials.
 
 1. Create a [Setlist.fm API key](https://www.setlist.fm/settings/api).
 2. Create a [Spotify app](https://developer.spotify.com/dashboard) and copy its **Client ID**.
-3. Add the app's exact address, including the trailing slash, as a Spotify Redirect URI:
+3. Add the app's Spotify callback URI as a Redirect URI:
 
-   - Local development: `http://localhost:3000/`
-   - Pinokio: the localhost URL shown by Pinokio after you start the app
-   - Your own deployment: your public app URL, ending in `/`
+   - Local development: `http://127.0.0.1:3000/api/spotify/callback`
+   - Pinokio: the `http://127.0.0.1:<port>/api/spotify/callback` URL shown by its settings page
+   - Your own deployment: `https://your-domain/api/spotify/callback`
 
 4. After starting a local or Pinokio installation, open **Local settings** at `/settings` to enter both values. Add the exact Redirect URI shown there to your Spotify app; local and Pinokio sign-in uses `/api/spotify/callback`. The page writes the keys to `app/.env.local`, then asks you to restart the app. You can also create the file manually:
 
@@ -96,7 +96,7 @@ npm ci
 npm run dev
 ```
 
-Open `https://localhost:3000/`. On first launch, use the local setup banner to open **Local settings**, enter your credentials, and restart the app. Then connect Spotify and search for a show.
+Open `http://127.0.0.1:3000/`. On first launch, use the local setup banner to open **Local settings**, enter your credentials, and restart the app. Then connect Spotify and search for a show.
 
 On Windows PowerShell, use this copy command instead:
 
@@ -113,7 +113,7 @@ This repository includes a one-click [Pinokio](https://desktop.pinokio.co/docs/#
 1. Clone the repository into `PINOKIO_HOME/api/setlist-to-playlist`.
 2. Open **Setlist to Playlist** in Pinokio and choose **Install**.
 3. Choose **Start**, then open **Settings & API keys**.
-4. Add your two values and the secure `https://localhost:<port>/api/spotify/callback` Redirect URI shown by the settings page to your Spotify app.
+4. Add your two values and the `http://127.0.0.1:<port>/api/spotify/callback` Redirect URI shown by the settings page to your Spotify app. Spotify permits HTTP only for this explicit loopback address; it does not accept `localhost`.
 5. Restart the app in Pinokio, then choose **Open Web UI**.
 
 The launcher also includes **Update** and **Reset** actions.
