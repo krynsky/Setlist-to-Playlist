@@ -27,6 +27,18 @@ test("the UI still creates a playlist with the requested visibility after tracks
   assert.match(source, /Created with https:\/\/setlist-to-playlist\.krynsky\.com/);
 });
 
+test("the site and Pinokio launcher share the same favicon artwork", async () => {
+  const [layout, metadata, siteIcon, launcherIcon] = await Promise.all([
+    readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../../pinokio.json", import.meta.url), "utf8"),
+    readFile(new URL("../public/favicon.svg", import.meta.url), "utf8"),
+    readFile(new URL("../../icon.svg", import.meta.url), "utf8"),
+  ]);
+  assert.match(layout, /icon: "\/favicon\.svg"/);
+  assert.equal(JSON.parse(metadata).icon, "icon.svg");
+  assert.equal(siteIcon, launcherIcon);
+});
+
 test("recent setlists are optional and limited to nine shared entries", async () => {
   const [page, route, storage] = await Promise.all([
     readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),

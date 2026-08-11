@@ -2,6 +2,7 @@ module.exports = {
   version: "8.0.0",
   title: "Setlist to Playlist",
   description: "Create Spotify playlists from Setlist.fm shows using your own API keys.",
+  icon: "icon.svg",
   menu: async (kernel, info) => {
     const installed = info.exists("app/node_modules")
     const running = info.running("start.js")
