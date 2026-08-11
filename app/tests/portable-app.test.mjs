@@ -23,7 +23,7 @@ test("the portable app requires user-owned credentials and keeps demo analytics 
 test("the UI still creates a playlist with the requested visibility after tracks are added", async () => {
   const source = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
   const addSongs = source.indexOf("for (let index = 0; index < uris.length; index += 100)");
-  const applyVisibility = source.indexOf("await applySpotifyPlaylistVisibility(playlist.id, isPublic, spotifyClientId)");
+  const applyVisibility = source.indexOf("await applySpotifyPlaylistVisibility(");
   assert.ok(addSongs >= 0 && addSongs < applyVisibility);
   assert.match(source, /name: setlistTitle\(selected\)/);
   assert.match(source, /\[setlist\.artist\.name, formatDate\(setlist\.eventDate\), location\]/);
@@ -74,6 +74,29 @@ test("local settings are loopback-only and save credentials without exposing the
   assert.match(home, /Open local settings/);
   assert.match(form, /Restart the app/);
   assert.match(launcher, /Settings & API keys/);
+});
+
+test("local Spotify authorization reconnects the Pinokio Web UI after browser sign-in", async () => {
+  const [page, config, authorize, callback, session, gitignore, settings] = await Promise.all([
+    readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/api/config/route.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/api/spotify/authorize/route.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/api/spotify/callback/route.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/api/spotify/session/route.ts", import.meta.url), "utf8"),
+    readFile(new URL("../.gitignore", import.meta.url), "utf8"),
+    readFile(new URL("../app/settings/settings-form.tsx", import.meta.url), "utf8"),
+  ]);
+  assert.match(config, /localSpotifyAuth/);
+  assert.match(authorize, /\/api\/spotify\/callback/);
+  assert.match(authorize, /savePendingSpotifyAuth/);
+  assert.match(callback, /saveLocalSpotifySession/);
+  assert.match(session, /refresh_token/);
+  assert.match(session, /clearLocalSpotifySession/);
+  assert.match(page, /window\.open\("\/api\/spotify\/authorize"/);
+  assert.match(page, /Finish connecting Spotify in the browser/);
+  assert.match(page, /Local settings/);
+  assert.match(settings, /\/api\/spotify\/callback/);
+  assert.match(gitignore, /^\.spotify-\*\.json$/m);
 });
 
 test("the demo exposes complete discovery metadata and a social share image", async () => {

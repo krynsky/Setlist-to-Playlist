@@ -19,7 +19,7 @@ export function SettingsForm() {
   useEffect(() => {
     fetch("/api/settings")
       .then((response) => {
-        setRedirectUri(`${window.location.origin}/`);
+        setRedirectUri(`${window.location.origin}/api/spotify/callback`);
         return response.json();
       })
       .then((data) => setConfigured(data))

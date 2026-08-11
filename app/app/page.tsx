@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 
 type SetlistSong = {
   name: string;
@@ -112,9 +113,25 @@ function clearSpotifySession() {
   );
 }
 
-async function beginSpotifyLogin(clientId: string | null) {
+async function localSpotifySession() {
+  const response = await fetch("/api/spotify/session", { cache: "no-store" });
+  if (!response.ok) return { connected: false, accessToken: null };
+  const data = await response.json();
+  return {
+    connected: Boolean(data.connected && data.accessToken),
+    accessToken: data.accessToken || null,
+  };
+}
+
+async function beginSpotifyLogin(clientId: string | null, useLocalSpotifyAuth: boolean) {
   if (!clientId) {
     throw new Error("Spotify is not configured yet. Add the client ID, then restart the app.");
+  }
+
+  if (useLocalSpotifyAuth) {
+    const popup = window.open("/api/spotify/authorize", "_blank", "noopener");
+    if (!popup) throw new Error("Allow pop-ups to connect Spotify, then try again.");
+    return;
   }
 
   const verifier = base64Url(crypto.getRandomValues(new Uint8Array(64)));
@@ -160,7 +177,13 @@ async function exchangeSpotifyCode(code: string, clientId: string | null) {
   localStorage.removeItem(VERIFIER_KEY);
 }
 
-async function spotifyAccessToken(clientId: string | null) {
+async function spotifyAccessToken(clientId: string | null, useLocalSpotifyAuth: boolean) {
+  if (useLocalSpotifyAuth) {
+    const session = await localSpotifySession();
+    if (session.connected && session.accessToken) return session.accessToken;
+    throw new Error("Your Spotify session expired. Connect Spotify again.");
+  }
+
   const token = localStorage.getItem(TOKEN_KEY);
   const expires = Number(localStorage.getItem(EXPIRES_KEY));
   if (token && expires > Date.now() + 30_000) return token;
@@ -194,18 +217,19 @@ async function spotifyRequest(
   path: string,
   options: RequestInit = {},
   clientId: string | null,
+  useLocalSpotifyAuth: boolean,
 ) {
   const response = await fetch(`${SPOTIFY_API}${path}`, {
     ...options,
     headers: {
-      Authorization: `Bearer ${await spotifyAccessToken(clientId)}`,
+      Authorization: `Bearer ${await spotifyAccessToken(clientId, useLocalSpotifyAuth)}`,
       "Content-Type": "application/json",
       ...options.headers,
     },
   });
   const data = response.status === 204 ? null : await response.json().catch(() => null);
   if (!response.ok) {
-    if (response.status === 401) clearSpotifySession();
+    if (response.status === 401 && !useLocalSpotifyAuth) clearSpotifySession();
     throw new Error(data?.error?.message || `Spotify request failed (${response.status}).`);
   }
   return data;
@@ -214,13 +238,14 @@ async function spotifyRequest(
 async function findSpotifyTrack(
   song: Song,
   clientId: string | null,
+  useLocalSpotifyAuth: boolean,
 ): Promise<SpotifyTrack | null> {
   const query = new URLSearchParams({
     q: `track:${song.name} artist:${song.searchArtist}`,
     type: "track",
     limit: "1",
   });
-  const result = await spotifyRequest(`/search?${query}`, {}, clientId);
+  const result = await spotifyRequest(`/search?${query}`, {}, clientId, useLocalSpotifyAuth);
   return result.tracks?.items?.[0] ?? null;
 }
 
@@ -228,11 +253,12 @@ async function applySpotifyPlaylistVisibility(
   playlistId: string,
   isPublic: boolean,
   clientId: string | null,
+  useLocalSpotifyAuth: boolean,
 ) {
   await spotifyRequest(`/playlists/${playlistId}`, {
     method: "PUT",
     body: JSON.stringify({ public: isPublic }),
-  }, clientId);
+  }, clientId, useLocalSpotifyAuth);
 }
 
 export default function Home() {
@@ -245,6 +271,9 @@ export default function Home() {
   const [connected, setConnected] = useState(false);
   const [spotifyClientId, setSpotifyClientId] = useState<string | null>(null);
   const [setupRequired, setSetupRequired] = useState(false);
+  const [settingsAvailable, setSettingsAvailable] = useState(false);
+  const [localSpotifyAuth, setLocalSpotifyAuth] = useState(false);
+  const [waitingForSpotify, setWaitingForSpotify] = useState(false);
   const [isPublic, setIsPublic] = useState(false);
   const [recentSetlists, setRecentSetlists] = useState<RecentSetlist[]>([]);
   const [busy, setBusy] = useState(false);
@@ -269,6 +298,13 @@ export default function Home() {
       const clientId = config.spotifyClientId || null;
       setSpotifyClientId(clientId);
       setSetupRequired(Boolean(config.settingsAvailable && !config.isConfigured));
+      setSettingsAvailable(Boolean(config.settingsAvailable));
+      setLocalSpotifyAuth(Boolean(config.localSpotifyAuth));
+      if (config.localSpotifyAuth) {
+        const session = await localSpotifySession();
+        setConnected(session.connected);
+        return;
+      }
       setConnected(hasSpotifySession());
       const params = new URLSearchParams(window.location.search);
       const code = params.get("code");
@@ -293,6 +329,21 @@ export default function Home() {
     }
     void initializeSpotify();
   }, []);
+
+  useEffect(() => {
+    if (!waitingForSpotify || !localSpotifyAuth) return;
+
+    const checkForConnection = async () => {
+      const session = await localSpotifySession();
+      if (!session.connected) return;
+      setConnected(true);
+      setWaitingForSpotify(false);
+      setStatus("Spotify connected. Choose a show to create your playlist.");
+    };
+    void checkForConnection();
+    const interval = window.setInterval(() => void checkForConnection(), 1200);
+    return () => window.clearInterval(interval);
+  }, [localSpotifyAuth, waitingForSpotify]);
 
   useEffect(() => {
     fetch("/api/recent-setlists")
@@ -352,14 +403,21 @@ export default function Home() {
 
   async function connectOrDisconnect() {
     if (connected) {
-      clearSpotifySession();
+      if (localSpotifyAuth) await fetch("/api/spotify/session", { method: "DELETE" });
+      else clearSpotifySession();
       setConnected(false);
+      setWaitingForSpotify(false);
       setStatus("Spotify disconnected.");
       return;
     }
     try {
-      await beginSpotifyLogin(spotifyClientId);
+      if (localSpotifyAuth) {
+        setWaitingForSpotify(true);
+        setStatus("Finish connecting Spotify in the browser that just opened. This window will update automatically.");
+      }
+      await beginSpotifyLogin(spotifyClientId, localSpotifyAuth);
     } catch (error) {
+      setWaitingForSpotify(false);
       setStatus(error instanceof Error ? error.message : "Spotify connection failed.");
     }
   }
@@ -384,7 +442,7 @@ export default function Home() {
         setStatus(`Matching song ${index + 1} of ${chosenSongs.length} on Spotify…`);
         matches.push({
           song: chosenSongs[index],
-          track: await findSpotifyTrack(chosenSongs[index], spotifyClientId),
+          track: await findSpotifyTrack(chosenSongs[index], spotifyClientId, localSpotifyAuth),
         });
       }
 
@@ -402,19 +460,19 @@ export default function Home() {
           description: `Setlist from ${venueLabel(selected)}. Created with https://setlist-to-playlist.krynsky.com`,
           public: isPublic,
         }),
-      }, spotifyClientId);
+      }, spotifyClientId, localSpotifyAuth);
 
       for (let index = 0; index < uris.length; index += 100) {
         await spotifyRequest(`/playlists/${playlist.id}/items`, {
           method: "POST",
           body: JSON.stringify({ uris: uris.slice(index, index + 100) }),
-        }, spotifyClientId);
+        }, spotifyClientId, localSpotifyAuth);
       }
 
       let visibilityWarning = "";
       setStatus(`Applying ${isPublic ? "public" : "private"} playlist visibility…`);
       try {
-        await applySpotifyPlaylistVisibility(playlist.id, isPublic, spotifyClientId);
+        await applySpotifyPlaylistVisibility(playlist.id, isPublic, spotifyClientId, localSpotifyAuth);
       } catch {
         visibilityWarning =
           "Spotify added the songs but could not apply the visibility setting. You can change it in Spotify.";
@@ -446,7 +504,8 @@ export default function Home() {
         })
         .catch(() => undefined);
     } catch (error) {
-      setConnected(hasSpotifySession());
+      if (localSpotifyAuth) setConnected((await localSpotifySession()).connected);
+      else setConnected(hasSpotifySession());
       setStatus(error instanceof Error ? error.message : "Playlist creation failed.");
     } finally {
       setBusy(false);
@@ -505,6 +564,7 @@ export default function Home() {
           <span aria-hidden="true">●</span>
           {connected ? "Spotify connected" : "Connect Spotify"}
         </button>
+        {settingsAvailable && <Link className="local-settings-link" href="/settings">Local settings</Link>}
         <p className="helper">Use any combination of artist, city, and year</p>
         <a
           className="coffee-button"

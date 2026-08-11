@@ -6,5 +6,6 @@ export async function GET(request: NextRequest) {
     spotifyClientId: process.env.SPOTIFY_CLIENT_ID || null,
     isConfigured: Boolean(process.env.SETLIST_FM_API_KEY && process.env.SPOTIFY_CLIENT_ID),
     settingsAvailable: isLoopbackHost(request.headers.get("host")),
+    localSpotifyAuth: isLoopbackHost(request.headers.get("host")),
   });
 }

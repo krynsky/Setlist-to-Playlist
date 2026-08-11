@@ -65,7 +65,7 @@ Every installation needs its own API credentials.
    - Pinokio: the localhost URL shown by Pinokio after you start the app
    - Your own deployment: your public app URL, ending in `/`
 
-4. After starting a local or Pinokio installation, open **Local settings** at `/settings` to enter both values. The page writes them to `app/.env.local`, then asks you to restart the app. You can also create the file manually:
+4. After starting a local or Pinokio installation, open **Local settings** at `/settings` to enter both values. Add the exact Redirect URI shown there to your Spotify app; local and Pinokio sign-in uses `/api/spotify/callback`. The page writes the keys to `app/.env.local`, then asks you to restart the app. You can also create the file manually:
 
    ```env
    SETLIST_FM_API_KEY=your_setlist_fm_key
@@ -170,6 +170,7 @@ update.js         # Pinokio update action
 - Your Setlist.fm API key stays on the server route and is never sent to the browser.
 - Spotify authentication happens directly with Spotify using PKCE; no Spotify client secret is stored or required.
 - Spotify access and refresh tokens are stored in your browser's local storage for your own session.
+- For a local or Pinokio installation, the local app server keeps the Spotify session in an ignored `.spotify-session.json` file so an external Spotify browser login can reconnect the embedded Web UI.
 - The app creates playlists only in the Spotify account you authorize.
 
 ---
