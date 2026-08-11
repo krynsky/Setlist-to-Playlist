@@ -37,6 +37,7 @@ test("recent setlists are optional and limited to nine shared entries", async ()
   assert.match(route, /isRecentSetlistsEnabled/);
   assert.match(route, /SETLIST_FM_API_KEY/);
   assert.match(route, /setlistId/);
+  assert.match(route, /setlist\.artist\?\.name,\s*date,\s*\[setlist\.venue/);
   assert.match(storage, /const MAX_RECENT_SETLISTS = 9/);
   assert.match(storage, /process\.env\.BLOB_READ_WRITE_TOKEN/);
 });

@@ -26,11 +26,11 @@ function titleForSetlist(setlist: SetlistRecord) {
       : "";
   return [
     setlist.artist?.name,
-    [setlist.venue?.city?.name, setlist.venue?.name].filter(Boolean).join(" · "),
     date,
+    [setlist.venue?.city?.name, setlist.venue?.name].filter(Boolean).join(" · "),
   ]
     .filter(Boolean)
-    .join(" — ");
+    .join(" - ");
 }
 
 export async function GET() {
