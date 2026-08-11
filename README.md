@@ -96,7 +96,7 @@ npm ci
 npm run dev
 ```
 
-Open `http://localhost:3000/`. On first launch, use the local setup banner to open **Local settings**, enter your credentials, and restart the app. Then connect Spotify and search for a show.
+Open `https://localhost:3000/`. On first launch, use the local setup banner to open **Local settings**, enter your credentials, and restart the app. Then connect Spotify and search for a show.
 
 On Windows PowerShell, use this copy command instead:
 
@@ -113,7 +113,7 @@ This repository includes a one-click [Pinokio](https://desktop.pinokio.co/docs/#
 1. Clone the repository into `PINOKIO_HOME/api/setlist-to-playlist`.
 2. Open **Setlist to Playlist** in Pinokio and choose **Install**.
 3. Choose **Start**, then open **Settings & API keys**.
-4. Add your two values and the exact redirect URI shown by the settings page to your Spotify app.
+4. Add your two values and the secure `https://localhost:<port>/api/spotify/callback` Redirect URI shown by the settings page to your Spotify app.
 5. Restart the app in Pinokio, then choose **Open Web UI**.
 
 The launcher also includes **Update** and **Reset** actions.
