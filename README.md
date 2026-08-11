@@ -1,21 +1,27 @@
-# Encore — Setlist to Spotify
+# Setlist to Playlist
 
-Encore searches Setlist.fm for a concert, preserves the performed song order, matches each song on Spotify, and creates a playlist in the signed-in listener's account.
+Search Setlist.fm, choose a show, and create a Spotify playlist in setlist order. Every installation uses its own Setlist.fm key and Spotify app—no shared credentials are included.
 
-## Local setup
+## Run locally
 
-1. Copy `.env.example` to `.env.local`.
-2. Create a [Setlist.fm API key](https://www.setlist.fm/settings/api) and set `SETLIST_FM_API_KEY`.
-3. Create an app in the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard), set `SPOTIFY_CLIENT_ID`, and add the local URL printed by `npm run dev` as an allowed Redirect URI.
-4. Run `npm install`, then `npm run dev`.
+Requires Node.js 20.9 or later.
 
-Spotify login uses Authorization Code with PKCE. The client ID is public by design; no Spotify client secret is used. Setlist.fm requests run through the server route so its API key is not exposed in browser code.
+1. `cd app`
+2. Copy `.env.example` to `.env.local`.
+3. Add your [Setlist.fm API key](https://www.setlist.fm/settings/api) as `SETLIST_FM_API_KEY`.
+4. Create a Spotify app, add `http://localhost:3000/` as a Redirect URI, and set its client ID as `SPOTIFY_CLIENT_ID`.
+5. Run `npm ci` and then `npm run dev`.
 
-## API behavior
+Spotify uses Authorization Code with PKCE, so no Spotify client secret is needed. The Setlist.fm key is used only by the server route and is never sent to the browser.
 
-- Setlist search uses `GET /rest/1.0/search/setlists` with Setlist.fm's required `x-api-key` header.
-- Playlist creation uses Spotify's `POST /me/playlists` endpoint.
-- Matched tracks are added in setlist order with `POST /playlists/{playlist_id}/items`, in batches of 100.
-- Cover songs are searched using the credited cover artist when Setlist.fm supplies one.
+## Pinokio
 
-Setlist.fm's API is free for non-commercial projects under its terms.
+Clone this repository into `PINOKIO_HOME/api/setlist-to-playlist`, open it in Pinokio, choose **Install**, then edit `app/.env.local` with your two values. Start the app and add the exact localhost URL shown by Pinokio as a Spotify Redirect URI.
+
+## Deploy to Vercel
+
+Import this repository into Vercel and set **Root Directory** to `app`. Add `SETLIST_FM_API_KEY` and `SPOTIFY_CLIENT_ID` in Vercel Environment Variables. Add your deployed URL, including the trailing slash, as a Redirect URI in your Spotify app.
+
+## Development
+
+From `app`, run `npm run lint` and `npm test`.

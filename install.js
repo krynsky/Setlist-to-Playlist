@@ -1,0 +1,1 @@
+module.exports = { run: [{ method: "shell.run", params: { path: "app", message: ["node -e \"const fs=require('fs'); if (!fs.existsSync('.env.local')) fs.copyFileSync('.env.example','.env.local')\"", "npm ci"] } }] }

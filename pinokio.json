@@ -1,0 +1,5 @@
+{
+  "title": "Setlist to Playlist",
+  "description": "Create Spotify playlists from Setlist.fm shows using your own API keys.",
+  "menu": true
+}
