@@ -1,5 +1,4 @@
 import {
-  BlobPreconditionFailedError,
   get,
   put,
 } from "@vercel/blob";
@@ -44,60 +43,44 @@ export function isSetlistUrl(value: string) {
 }
 
 async function readHistory() {
-  const result = await get(HISTORY_PATH, {
-    access: "private",
-    useCache: false,
-  });
-  if (!result || result.statusCode !== 200 || !result.stream) {
-    return { entries: [] as RecentSetlist[], etag: undefined };
-  }
-
   try {
+    const result = await get(HISTORY_PATH, {
+      access: "private",
+      useCache: false,
+    });
+    if (!result) return [] as RecentSetlist[];
+    if (result.statusCode !== 200 || !result.stream) return null;
+
     const data = JSON.parse(await new Response(result.stream).text());
-    const entries = Array.isArray(data)
+    return Array.isArray(data)
       ? data.filter(isRecentSetlist).slice(0, MAX_RECENT_SETLISTS)
       : [];
-    return { entries, etag: result.blob.etag };
   } catch {
-    return { entries: [] as RecentSetlist[], etag: result.blob.etag };
+    return null;
   }
 }
 
 export async function getRecentSetlists() {
   if (!isRecentSetlistsEnabled()) return [];
-  try {
-    return (await readHistory()).entries;
-  } catch {
-    return [];
-  }
+  return (await readHistory()) ?? [];
 }
 
 export async function addRecentSetlist(entry: RecentSetlist) {
   if (!isRecentSetlistsEnabled() || !isRecentSetlist(entry)) return null;
 
-  for (let attempt = 0; attempt < 3; attempt += 1) {
-    const { entries, etag } = await readHistory();
-    const next = [entry, ...entries.filter((item) => item.url !== entry.url)].slice(
-      0,
-      MAX_RECENT_SETLISTS,
-    );
+  const entries = await readHistory();
+  if (!entries) return null;
+  const next = [entry, ...entries.filter((item) => item.url !== entry.url)].slice(
+    0,
+    MAX_RECENT_SETLISTS,
+  );
 
-    try {
-      await put(HISTORY_PATH, JSON.stringify(next), {
-        access: "private",
-        addRandomSuffix: false,
-        allowOverwrite: true,
-        cacheControlMaxAge: 60,
-        contentType: "application/json",
-        ...(etag ? { ifMatch: etag } : {}),
-      });
-      return next;
-    } catch (error) {
-      if (!(error instanceof BlobPreconditionFailedError) || attempt === 2) {
-        throw error;
-      }
-    }
-  }
-
-  return null;
+  await put(HISTORY_PATH, JSON.stringify(next), {
+    access: "private",
+    addRandomSuffix: false,
+    allowOverwrite: true,
+    cacheControlMaxAge: 60,
+    contentType: "application/json",
+  });
+  return next;
 }

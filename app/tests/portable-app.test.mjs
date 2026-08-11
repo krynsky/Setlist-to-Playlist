@@ -47,4 +47,5 @@ test("recent setlists are optional and limited to nine shared entries", async ()
   assert.match(page, /ok && Array\.isArray\(data\?\.entries\)/);
   assert.match(storage, /const MAX_RECENT_SETLISTS = 9/);
   assert.match(storage, /process\.env\.BLOB_READ_WRITE_TOKEN/);
+  assert.doesNotMatch(storage, /ifMatch/);
 });
