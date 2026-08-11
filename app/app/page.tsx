@@ -644,29 +644,32 @@ export default function Home() {
             </a>
           </aside>
 
-          {recentSetlists.length > 0 && (
-            <section className="recent-setlists" aria-labelledby="recent-setlists-title">
-              <div className="section-title">
-                <span>03</span>
-                <h2 id="recent-setlists-title">Recently turned into playlists</h2>
-              </div>
-              <div className="recent-setlist-grid">
-                {recentSetlists.map((setlist) => (
-                  <a href={setlist.url} key={setlist.url} target="_blank" rel="noreferrer">
-                    <span>Setlist.fm</span>
-                    <strong>{setlist.title}</strong>
-                    <small>
-                      {new Intl.DateTimeFormat(undefined, {
-                        dateStyle: "medium",
-                      }).format(new Date(setlist.createdAt))}
-                    </small>
-                  </a>
-                ))}
-              </div>
-            </section>
-          )}
         </>
       )}
+
+      <section className="recent-setlists" aria-labelledby="recent-setlists-title">
+        <div className="section-title">
+          <span>03</span>
+          <h2 id="recent-setlists-title">Recently turned into playlists</h2>
+        </div>
+        {recentSetlists.length > 0 ? (
+          <div className="recent-setlist-grid">
+            {recentSetlists.map((setlist) => (
+              <a href={setlist.url} key={setlist.url} target="_blank" rel="noreferrer">
+                <span>Setlist.fm</span>
+                <strong>{setlist.title}</strong>
+                <small>
+                  {new Intl.DateTimeFormat(undefined, {
+                    dateStyle: "medium",
+                  }).format(new Date(setlist.createdAt))}
+                </small>
+              </a>
+            ))}
+          </div>
+        ) : (
+          <p className="recent-empty">The latest setlists turned into playlists will appear here.</p>
+        )}
+      </section>
 
       <footer>
         <span>

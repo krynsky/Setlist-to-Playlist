@@ -50,6 +50,7 @@ h1 em { color: var(--acid); }
 .recent-setlist-grid span { color: var(--acid); font: 10px var(--font-geist-mono); letter-spacing: .1em; text-transform: uppercase; }
 .recent-setlist-grid strong { flex: 1; font-size: 14px; line-height: 1.35; }
 .recent-setlist-grid small { color: #91a0ba; font: 10px var(--font-geist-mono); }
+.recent-empty { display: grid; min-height: 92px; margin: 0; padding: 20px; color: #7f8ea8; border: 1px dashed #455675; place-items: center; text-align: center; font-size: 14px; }
 .results-panel, .playlist-panel { min-width: 0; padding: 27px 28px; }
 .results-panel { border-right: 1px solid var(--line); }
 .section-title { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }

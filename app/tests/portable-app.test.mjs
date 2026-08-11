@@ -34,6 +34,11 @@ test("recent setlists are optional and limited to nine shared entries", async ()
     readFile(new URL("../lib/recent-setlists.ts", import.meta.url), "utf8"),
   ]);
   assert.match(page, /Recently turned into playlists/);
+  assert.ok(
+    page.indexOf('{success &&') < page.indexOf('<section className="recent-setlists"'),
+    "the shared history section should remain visible outside the playlist-success condition",
+  );
+  assert.match(page, /The latest setlists turned into playlists will appear here/);
   assert.match(route, /isRecentSetlistsEnabled/);
   assert.match(route, /SETLIST_FM_API_KEY/);
   assert.match(route, /setlistId/);
