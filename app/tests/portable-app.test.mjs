@@ -42,6 +42,18 @@ test("the site and Pinokio launcher share the same favicon artwork", async () =>
   assert.equal(siteIcon, launcherIcon);
 });
 
+test("the Pinokio launcher captures its localhost URL and opens it inside Pinokio", async () => {
+  const [launcher, start] = await Promise.all([
+    readFile(new URL("../../pinokio.js", import.meta.url), "utf8"),
+    readFile(new URL("../../start.js", import.meta.url), "utf8"),
+  ]);
+  assert.match(start, /\[0-9\.:\]\+/);
+  assert.match(start, /url: "\{\{input\.event\[1\]\}\}"/);
+  assert.match(launcher, /text: "Open Web UI"/);
+  assert.match(launcher, /href: local\.url/);
+  assert.doesNotMatch(launcher, /target: "_blank"/);
+});
+
 test("the demo exposes complete discovery metadata and a social share image", async () => {
   const [layout, ogImage, robots, sitemap, llms] = await Promise.all([
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
