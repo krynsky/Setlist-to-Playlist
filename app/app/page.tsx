@@ -676,6 +676,11 @@ export default function Home() {
           Powered by Setlist.fm and Spotify · Your Spotify login stays between you
           and Spotify.
         </span>
+      </footer>
+      <p className="creator-credit">
+        <span>
+          Created by <a href="https://krynsky.com/">Mark Krynsky</a>
+        </span>
         <a
           className="github-link"
           href="https://github.com/krynsky/Setlist-to-Playlist"
@@ -689,9 +694,6 @@ export default function Home() {
           </svg>
           <span>View on GitHub</span>
         </a>
-      </footer>
-      <p className="creator-credit">
-        Created by <a href="https://krynsky.com/">Mark Krynsky</a>
       </p>
     </main>
   );

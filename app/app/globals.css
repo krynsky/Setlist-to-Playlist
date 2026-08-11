@@ -93,11 +93,12 @@ h1 em { color: var(--acid); }
 .success div { min-width: 0; flex: 1; }
 .success strong { font-size: 14px; }
 .success p { margin: 3px 0 0; color: #b8cbb9; font-size: 12px; }
-footer { display: flex; align-items: center; justify-content: center; gap: 13px; padding: 25px; color: #71809c; border-top: 1px solid #263653; text-align: center; font: 11px var(--font-geist-mono); }
+footer { padding: 25px; color: #71809c; border-top: 1px solid #263653; text-align: center; font: 11px var(--font-geist-mono); }
 .github-link { display: inline-flex; align-items: center; gap: 6px; color: #9db1d3; text-decoration: none; white-space: nowrap; }
 .github-link:hover { color: #fff; }
 .github-link svg { width: 15px; height: 15px; }
 .creator-credit { margin: -14px 0 25px; color: #71809c; text-align: center; font: 11px var(--font-geist-mono); }
+.creator-credit > span { display: block; margin-bottom: 8px; }
 .creator-credit a { color: #9db1d3; text-underline-offset: 3px; }
 .creator-credit a:hover { color: #fff; }
 
@@ -127,7 +128,6 @@ footer { display: flex; align-items: center; justify-content: center; gap: 13px;
   .recent-setlist-grid { grid-template-columns: 1fr; }
   .selected-show { flex-direction: column; }
   .selected-show a { align-self: flex-start; }
-  footer { flex-direction: column; gap: 10px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
