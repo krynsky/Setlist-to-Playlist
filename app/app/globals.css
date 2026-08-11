@@ -23,7 +23,7 @@ main { min-height: 100vh; overflow: hidden; background: radial-gradient(ellipse 
 .spotify-button { display: flex; align-items: center; gap: 8px; margin: 18px auto 0; padding: 9px 12px; color: var(--acid); background: transparent; border: 1px solid #647250; border-radius: 3px; font-size: 12px; font-weight: 650; }
 .spotify-button span { font-size: 10px; }
 
-.hero { max-width: 1000px; margin: auto; padding: 84px 28px 78px; text-align: center; }
+.hero { max-width: 1000px; margin: auto; padding: 84px 28px 40px; text-align: center; }
 .eyebrow { margin: 0 0 14px; color: var(--acid); font: 11px var(--font-geist-mono); letter-spacing: .15em; }
 h1 { margin: 0; font: 700 clamp(50px, 8vw, 94px)/.96 Georgia, "Times New Roman", serif; letter-spacing: -.055em; }
 h1 em { color: var(--acid); }
@@ -90,7 +90,7 @@ footer { padding: 25px; color: #71809c; border-top: 1px solid #263653; text-alig
 .creator-credit a:hover { color: #fff; }
 
 @media (max-width: 760px) {
-  .hero { padding: 60px 20px 54px; }
+  .hero { padding: 60px 20px 34px; }
   .search { max-width: 590px; }
   .workspace { grid-template-columns: 1fr; margin: 0 16px 35px; }
   .results-panel { border-right: 0; border-bottom: 1px solid var(--line); }
