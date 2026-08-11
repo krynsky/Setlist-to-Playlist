@@ -9,6 +9,7 @@ A small web app that turns a concert setlist into a Spotify playlist, in the ord
 - 🆓 Free and open source — bring your own Setlist.fm and Spotify credentials
 
 **[Try the live demo →](https://setlist-to-playlist.krynsky.com/)**
+
 [<img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" width="150">](https://www.buymeacoffee.com/krynsky)
 
 ![Setlist to Playlist landing page](assets/landing-page.png)
