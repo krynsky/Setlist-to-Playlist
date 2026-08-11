@@ -621,49 +621,51 @@ export default function Home() {
         </div>
       </section>
 
-      {recentSetlists.length > 0 && (
-        <section className="recent-setlists" aria-labelledby="recent-setlists-title">
-          <div className="section-title">
-            <span>03</span>
-            <h2 id="recent-setlists-title">Recently turned into playlists</h2>
-          </div>
-          <div className="recent-setlist-grid">
-            {recentSetlists.map((setlist) => (
-              <a href={setlist.url} key={setlist.url} target="_blank" rel="noreferrer">
-                <span>Setlist.fm</span>
-                <strong>{setlist.title}</strong>
-                <small>
-                  {new Intl.DateTimeFormat(undefined, {
-                    dateStyle: "medium",
-                  }).format(new Date(setlist.createdAt))}
-                </small>
-              </a>
-            ))}
-          </div>
-        </section>
-      )}
-
       <div className="status" role="status" aria-live="polite">
         {status || "Ready to find a show."}
       </div>
 
       {success && (
-        <aside className="success" aria-label="Playlist created">
-          <span aria-hidden="true">✓</span>
-          <div>
-            <strong>Your playlist is ready</strong>
-            <p>
-              {success.isPublic ? "Public" : "Private"} · {success.added} songs added
-              {success.unmatched.length
-                ? ` · ${success.unmatched.length} unmatched: ${success.unmatched.join(", ")}`
-                : ""}
-              {success.visibilityWarning ? ` · ${success.visibilityWarning}` : ""}
-            </p>
-          </div>
-          <a href={success.url} target="_blank" rel="noreferrer">
-            Open in Spotify ↗
-          </a>
-        </aside>
+        <>
+          <aside className="success" aria-label="Playlist created">
+            <span aria-hidden="true">✓</span>
+            <div>
+              <strong>Your playlist is ready</strong>
+              <p>
+                {success.isPublic ? "Public" : "Private"} · {success.added} songs added
+                {success.unmatched.length
+                  ? ` · ${success.unmatched.length} unmatched: ${success.unmatched.join(", ")}`
+                  : ""}
+                {success.visibilityWarning ? ` · ${success.visibilityWarning}` : ""}
+              </p>
+            </div>
+            <a href={success.url} target="_blank" rel="noreferrer">
+              Open in Spotify ↗
+            </a>
+          </aside>
+
+          {recentSetlists.length > 0 && (
+            <section className="recent-setlists" aria-labelledby="recent-setlists-title">
+              <div className="section-title">
+                <span>03</span>
+                <h2 id="recent-setlists-title">Recently turned into playlists</h2>
+              </div>
+              <div className="recent-setlist-grid">
+                {recentSetlists.map((setlist) => (
+                  <a href={setlist.url} key={setlist.url} target="_blank" rel="noreferrer">
+                    <span>Setlist.fm</span>
+                    <strong>{setlist.title}</strong>
+                    <small>
+                      {new Intl.DateTimeFormat(undefined, {
+                        dateStyle: "medium",
+                      }).format(new Date(setlist.createdAt))}
+                    </small>
+                  </a>
+                ))}
+              </div>
+            </section>
+          )}
+        </>
       )}
 
       <footer>
