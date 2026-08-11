@@ -23,6 +23,8 @@ test("the UI still creates a playlist with the requested visibility after tracks
   const applyVisibility = source.indexOf("await applySpotifyPlaylistVisibility(playlist.id, isPublic, spotifyClientId)");
   assert.ok(addSongs >= 0 && addSongs < applyVisibility);
   assert.match(source, /name: setlistTitle\(selected\)/);
+  assert.match(source, /\[setlist\.artist\.name, formatDate\(setlist\.eventDate\), location\]/);
+  assert.match(source, /Created with https:\/\/setlist-to-playlist\.krynsky\.com/);
 });
 
 test("recent setlists are optional and limited to nine shared entries", async () => {

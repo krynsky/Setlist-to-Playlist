@@ -73,9 +73,9 @@ function setlistTitle(setlist: Setlist) {
   const location = [setlist.venue?.city?.name, setlist.venue?.name]
     .filter(Boolean)
     .join(" · ");
-  return [setlist.artist.name, location, formatDate(setlist.eventDate)]
+  return [setlist.artist.name, formatDate(setlist.eventDate), location]
     .filter(Boolean)
-    .join(" — ");
+    .join(" - ");
 }
 
 function songsFromSetlist(setlist: Setlist): Song[] {
@@ -397,7 +397,7 @@ export default function Home() {
         method: "POST",
         body: JSON.stringify({
           name: setlistTitle(selected),
-          description: `Setlist from ${venueLabel(selected)}. Created with Encore.`,
+          description: `Setlist from ${venueLabel(selected)}. Created with https://setlist-to-playlist.krynsky.com`,
           public: isPublic,
         }),
       }, spotifyClientId);
