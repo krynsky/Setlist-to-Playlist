@@ -40,9 +40,11 @@ test("recent setlists are optional and limited to nine shared entries", async ()
   );
   assert.match(page, /The latest setlists turned into playlists will appear here/);
   assert.match(route, /isRecentSetlistsEnabled/);
-  assert.match(route, /SETLIST_FM_API_KEY/);
-  assert.match(route, /setlistId/);
+  assert.doesNotMatch(route, /SETLIST_API/);
+  assert.match(route, /body\?\.setlist/);
   assert.match(route, /setlist\.artist\?\.name,\s*date,\s*\[setlist\.venue/);
+  assert.match(page, /setlist: selected/);
+  assert.match(page, /ok && Array\.isArray\(data\?\.entries\)/);
   assert.match(storage, /const MAX_RECENT_SETLISTS = 9/);
   assert.match(storage, /process\.env\.BLOB_READ_WRITE_TOKEN/);
 });

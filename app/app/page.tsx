@@ -432,11 +432,16 @@ export default function Home() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          setlistId: selected.id,
+          setlist: selected,
         }),
       })
-        .then((response) => response.json())
-        .then((data) => setRecentSetlists(data.entries ?? []))
+        .then(async (response) => ({
+          ok: response.ok,
+          data: await response.json().catch(() => null),
+        }))
+        .then(({ ok, data }) => {
+          if (ok && Array.isArray(data?.entries)) setRecentSetlists(data.entries);
+        })
         .catch(() => undefined);
     } catch (error) {
       setConnected(hasSpotifySession());
