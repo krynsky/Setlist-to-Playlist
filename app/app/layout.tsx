@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Encore — Setlist to Spotify",
+  title: "Setlist to Playlist",
   description:
     "Find a concert setlist and turn it into a Spotify playlist in the order it was played.",
   icons: {
