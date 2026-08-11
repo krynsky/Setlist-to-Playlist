@@ -13,6 +13,8 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const goatCounterUrl = process.env.DEMO_GOATCOUNTER_URL;
+
 export const metadata: Metadata = {
   title: "Setlist to Playlist",
   description:
@@ -32,12 +34,14 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         {children}
-        <Script
-          data-goatcounter="https://krynsky.goatcounter.com/count"
-          async
-          src="//gc.zgo.at/count.js"
-          strategy="afterInteractive"
-        />
+        {goatCounterUrl && (
+          <Script
+            data-goatcounter={goatCounterUrl}
+            async
+            src="//gc.zgo.at/count.js"
+            strategy="afterInteractive"
+          />
+        )}
       </body>
     </html>
   );

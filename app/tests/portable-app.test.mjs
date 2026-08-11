@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-test("the portable app requires user-owned credentials and no hosted analytics token", async () => {
+test("the portable app requires user-owned credentials and keeps demo analytics opt-in", async () => {
   const [layout, env, route, config] = await Promise.all([
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
     readFile(new URL("../.env.example", import.meta.url), "utf8"),
@@ -10,6 +10,9 @@ test("the portable app requires user-owned credentials and no hosted analytics t
     readFile(new URL("../app/api/config/route.ts", import.meta.url), "utf8"),
   ]);
   assert.doesNotMatch(layout, /cloudflareinsights|data-cf-beacon/);
+  assert.match(layout, /process\.env\.DEMO_GOATCOUNTER_URL/);
+  assert.match(layout, /\{goatCounterUrl && \(/);
+  assert.doesNotMatch(env, /^DEMO_GOATCOUNTER_URL=/m);
   assert.match(env, /^SETLIST_FM_API_KEY=$/m);
   assert.match(env, /^SPOTIFY_CLIENT_ID=$/m);
   assert.match(route, /process\.env\.SETLIST_FM_API_KEY/);
