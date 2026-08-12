@@ -6,6 +6,8 @@ A small web app that turns a concert setlist into a Spotify playlist, in the ord
 - 📋 Review the songs before creating a playlist, including covers and encores
 - 🎧 Connect your own Spotify account with secure PKCE sign-in
 - 🔒 Create private playlists by default, or choose to make one public
+- 🕘 See up to nine recently converted Setlist.fm shows when shared history is enabled
+- 🖥️ Run it in a browser, locally, or from Pinokio
 - 🆓 Free and open source — bring your own Setlist.fm and Spotify credentials
 
 **[Try the live demo →](https://setlist-to-playlist.krynsky.com/)**
@@ -23,6 +25,8 @@ A small web app that turns a concert setlist into a Spotify playlist, in the ord
 - [Configuration](#-configuration)
 - [Run Locally](#-run-locally)
 - [Pinokio](#-pinokio)
+- [Deploy Your Own Copy](#-deploy-your-own-copy)
+- [Optional Demo Services](#optional-demo-services)
 - [Tech Stack](#-tech-stack)
 - [Development](#-development)
 - [Privacy and Security](#-privacy-and-security)
@@ -41,7 +45,9 @@ Step | What happens
 3. Review | Include or exclude individual songs before the playlist is created. Covers and encore songs are identified.
 4. Create | The app matches the selected songs on Spotify, creates a playlist in your account, and adds the matches in order.
 
-Playlist names include the artist, city, venue, and date. Playlists are private unless you explicitly enable **Make playlist public**.
+Playlist names use the format **Artist - Date - Location**. The playlist description links back to the live demo. Playlists are private unless you explicitly enable **Make playlist public**.
+
+When a deployment has shared history enabled, the page can show the latest nine Setlist.fm pages that visitors turned into playlists. It never exposes Spotify playlist links, account information, or API credentials.
 
 ---
 
@@ -51,6 +57,8 @@ The app searches Setlist.fm through a server route so your Setlist.fm API key st
 
 Song matching searches Spotify by track title and artist. If Spotify cannot find a song, the finished playlist reports it as unmatched rather than silently adding a different track.
 
+For local and Pinokio installations, Spotify sign-in opens in your regular browser. The local server safely keeps the completed session for that installation so the Pinokio Web UI reconnects automatically when you return.
+
 ---
 
 ## ⚙️ Configuration
@@ -59,13 +67,15 @@ Every installation needs its own API credentials.
 
 1. Create a [Setlist.fm API key](https://www.setlist.fm/settings/api).
 2. Create a [Spotify app](https://developer.spotify.com/dashboard) and copy its **Client ID**.
-3. Add the app's Spotify callback URI as a Redirect URI:
+3. Add the correct Spotify Redirect URI for the way you will run the app:
 
-   - Local development: `http://127.0.0.1:3000/api/spotify/callback`
-   - Pinokio: the `http://127.0.0.1:<port>/api/spotify/callback` URL shown by its settings page
-   - Your own deployment: `https://your-domain/api/spotify/callback`
+   | Installation | Redirect URI to add in Spotify |
+   | --- | --- |
+   | Local development | `http://127.0.0.1:3000/api/spotify/callback` |
+   | Pinokio | The exact `http://127.0.0.1:<port>/api/spotify/callback` URI shown by **Settings & API keys** after starting the app |
+   | Your own public deployment | Your exact public app URL, including the trailing slash, for example `https://your-domain.example/` |
 
-4. After starting a local or Pinokio installation, open **Local settings** at `/settings` to enter both values. Add the exact Redirect URI shown there to your Spotify app; local and Pinokio sign-in uses `/api/spotify/callback`. The page writes the keys to `app/.env.local`, then asks you to restart the app. You can also create the file manually:
+4. For a local or Pinokio installation, open **Local settings** at `/settings` to enter both values. The page writes the keys to `app/.env.local`, then asks you to restart the app. You can also create the file manually:
 
    ```env
    SETLIST_FM_API_KEY=your_setlist_fm_key
@@ -73,6 +83,9 @@ Every installation needs its own API credentials.
    ```
 
 `SETLIST_FM_API_KEY` is used only by the server. `SPOTIFY_CLIENT_ID` is intentionally available to the browser because Spotify identifies public OAuth apps by client ID.
+
+> [!IMPORTANT]
+> Spotify does not accept `localhost` for this local callback. Use the explicit `127.0.0.1` URI shown above. No HTTPS certificate or Spotify Client Secret is required for local or Pinokio use.
 
 ---
 
@@ -104,6 +117,8 @@ On Windows PowerShell, use this copy command instead:
 Copy-Item app/.env.example app/.env.local
 ```
 
+The **Local settings** link remains available after setup if you need to replace either credential.
+
 ---
 
 ## 🧩 Pinokio
@@ -113,10 +128,43 @@ This repository includes a one-click [Pinokio](https://desktop.pinokio.co/docs/#
 1. Clone the repository into `PINOKIO_HOME/api/setlist-to-playlist`.
 2. Open **Setlist to Playlist** in Pinokio and choose **Install**.
 3. Choose **Start**, then open **Settings & API keys**.
-4. Add your two values and the `http://127.0.0.1:<port>/api/spotify/callback` Redirect URI shown by the settings page to your Spotify app. Spotify permits HTTP only for this explicit loopback address; it does not accept `localhost`.
-5. Restart the app in Pinokio, then choose **Open Web UI**.
+4. Add your Setlist.fm key and Spotify Client ID, then copy the exact `http://127.0.0.1:<port>/api/spotify/callback` URI shown there into your Spotify app.
+5. Restart the app, then choose **Open Web UI**.
 
-The launcher also includes **Update** and **Reset** actions.
+Spotify authentication opens in your normal browser and returns to the local callback. When you return to Pinokio, its Web UI detects the completed session automatically. If you create a playlist before the button redraws, the app still reuses the saved session rather than asking you to authenticate again.
+
+The launcher also includes:
+
+- **Update** — pulls the latest repository changes and refreshes npm dependencies. Stop and start the app afterward.
+- **Reset dependencies** — rebuilds `node_modules` if an installation becomes unhealthy.
+- **Configure API keys** — opens the local `.env.local` file directly.
+
+Your `.env.local` credentials and local Spotify session files stay on your machine and are not committed by the launcher update.
+
+---
+
+## 🚀 Deploy Your Own Copy
+
+This project is a Next.js app located in the `app` directory. Deploy that directory to any Node.js-compatible host, then configure:
+
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `SETLIST_FM_API_KEY` | Yes | Server-side access to the Setlist.fm API |
+| `SPOTIFY_CLIENT_ID` | Yes | Spotify PKCE application identifier |
+| `BLOB_READ_WRITE_TOKEN` | Optional | Enables the shared list of the nine most recently converted Setlist.fm pages on supported Vercel Blob deployments |
+
+After deployment, add the deployed app’s root URL—with its trailing slash—to the Spotify app’s Redirect URIs. For example: `https://your-domain.example/`.
+
+Do not add any real key to `.env.example`, commit `.env.local`, or expose the Setlist.fm key in client-side code.
+
+---
+
+## Optional Demo Services
+
+The public demo at [setlist-to-playlist.krynsky.com](https://setlist-to-playlist.krynsky.com/) uses optional services that are not required for local or Pinokio use:
+
+- **Vercel Blob** stores the shared, non-user-specific recent Setlist.fm history when `BLOB_READ_WRITE_TOKEN` is configured.
+- **GoatCounter** analytics is enabled only when the deployment sets `DEMO_GOATCOUNTER_URL`. It is intentionally absent from `.env.example`, so local and Pinokio installations do not load the analytics script.
 
 ---
 
@@ -152,7 +200,7 @@ npm run build
 ```text
 app/
   app/
-    api/          # Setlist.fm proxy and runtime configuration route
+    api/          # Setlist.fm proxy, local settings, Spotify, and recent-history routes
     page.tsx      # Search, setlist selection, Spotify sign-in, playlist creation
   public/         # App icons and static assets
   tests/          # Portable-app build checks
@@ -169,8 +217,10 @@ update.js         # Pinokio update action
 
 - Your Setlist.fm API key stays on the server route and is never sent to the browser.
 - Spotify authentication happens directly with Spotify using PKCE; no Spotify client secret is stored or required.
-- Spotify access and refresh tokens are stored in your browser's local storage for your own session.
-- For a local or Pinokio installation, the local app server keeps the Spotify session in an ignored `.spotify-session.json` file so an external Spotify browser login can reconnect the embedded Web UI.
+- On public deployments, Spotify access and refresh tokens are stored in your browser's local storage for your own session.
+- For a local or Pinokio installation, the local app server keeps the Spotify session in ignored `.spotify-session.json` and temporary `.spotify-auth.json` files so an external Spotify browser login can reconnect the embedded Web UI.
+- The local settings page and local Spotify routes are available only from loopback addresses.
+- Shared history stores only a Setlist.fm URL, display title, and timestamp; it never stores Spotify account or playlist data.
 - The app creates playlists only in the Spotify account you authorize.
 
 ---
