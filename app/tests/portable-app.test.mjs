@@ -96,6 +96,9 @@ test("local Spotify authorization reconnects the Pinokio Web UI after browser si
   assert.match(session, /clearLocalSpotifySession/);
   assert.match(page, /window\.open\("\/api\/spotify\/authorize"/);
   assert.match(page, /Finish connecting Spotify in the browser/);
+  assert.match(page, /window\.addEventListener\("focus", checkForConnection\)/);
+  assert.match(page, /document\.addEventListener\("visibilitychange", checkWhenVisible\)/);
+  assert.match(page, /const session = await localSpotifySession\(\);/);
   assert.match(page, /Local settings/);
   assert.match(settings, /\/api\/spotify\/callback/);
   assert.match(settings, /http:\/\/127\.0\.0\.1/);

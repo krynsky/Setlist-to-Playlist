@@ -273,7 +273,6 @@ export default function Home() {
   const [setupRequired, setSetupRequired] = useState(false);
   const [settingsAvailable, setSettingsAvailable] = useState(false);
   const [localSpotifyAuth, setLocalSpotifyAuth] = useState(false);
-  const [waitingForSpotify, setWaitingForSpotify] = useState(false);
   const [isPublic, setIsPublic] = useState(false);
   const [recentSetlists, setRecentSetlists] = useState<RecentSetlist[]>([]);
   const [busy, setBusy] = useState(false);
@@ -331,19 +330,27 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (!waitingForSpotify || !localSpotifyAuth) return;
+    if (!localSpotifyAuth || connected) return;
 
     const checkForConnection = async () => {
       const session = await localSpotifySession();
       if (!session.connected) return;
       setConnected(true);
-      setWaitingForSpotify(false);
       setStatus("Spotify connected. Choose a show to create your playlist.");
+    };
+    const checkWhenVisible = () => {
+      if (document.visibilityState === "visible") void checkForConnection();
     };
     void checkForConnection();
     const interval = window.setInterval(() => void checkForConnection(), 1200);
-    return () => window.clearInterval(interval);
-  }, [localSpotifyAuth, waitingForSpotify]);
+    window.addEventListener("focus", checkForConnection);
+    document.addEventListener("visibilitychange", checkWhenVisible);
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener("focus", checkForConnection);
+      document.removeEventListener("visibilitychange", checkWhenVisible);
+    };
+  }, [connected, localSpotifyAuth]);
 
   useEffect(() => {
     fetch("/api/recent-setlists")
@@ -406,25 +413,31 @@ export default function Home() {
       if (localSpotifyAuth) await fetch("/api/spotify/session", { method: "DELETE" });
       else clearSpotifySession();
       setConnected(false);
-      setWaitingForSpotify(false);
       setStatus("Spotify disconnected.");
       return;
     }
     try {
       if (localSpotifyAuth) {
-        setWaitingForSpotify(true);
         setStatus("Finish connecting Spotify in the browser that just opened. This window will update automatically.");
       }
       await beginSpotifyLogin(spotifyClientId, localSpotifyAuth);
     } catch (error) {
-      setWaitingForSpotify(false);
       setStatus(error instanceof Error ? error.message : "Spotify connection failed.");
     }
   }
 
   async function createSpotifyPlaylist() {
     if (!selected) return;
-    if (!connected) {
+    let hasConnection = connected;
+    if (!hasConnection && localSpotifyAuth) {
+      const session = await localSpotifySession();
+      if (session.connected) {
+        setConnected(true);
+        setStatus("Spotify connected. Creating your playlist…");
+        hasConnection = true;
+      }
+    }
+    if (!hasConnection) {
       await connectOrDisconnect();
       return;
     }
