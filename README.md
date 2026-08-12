@@ -123,7 +123,7 @@ The **Local settings** link remains available after setup if you need to replace
 
 ## 🧩 Pinokio
 
-This repository includes a one-click [Pinokio](https://desktop.pinokio.co/docs/#/) launcher.
+This repository includes a one-click [Pinokio](https://desktop.pinokio.co) launcher.
 
 1. Clone the repository into `PINOKIO_HOME/api/setlist-to-playlist`.
 2. Open **Setlist to Playlist** in Pinokio and choose **Install**.
