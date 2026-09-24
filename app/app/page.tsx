@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { findSpotifyTrack, type SpotifyTrack } from "@/lib/spotify-track-match";
 
 type SetlistSong = {
   name: string;
@@ -31,12 +32,6 @@ type Song = {
   name: string;
   searchArtist: string;
   encore: boolean;
-};
-
-type SpotifyTrack = {
-  uri: string;
-  name: string;
-  artists: { name: string }[];
 };
 
 type RecentSetlist = {
@@ -233,20 +228,6 @@ async function spotifyRequest(
     throw new Error(data?.error?.message || `Spotify request failed (${response.status}).`);
   }
   return data;
-}
-
-async function findSpotifyTrack(
-  song: Song,
-  clientId: string | null,
-  useLocalSpotifyAuth: boolean,
-): Promise<SpotifyTrack | null> {
-  const query = new URLSearchParams({
-    q: `track:${song.name} artist:${song.searchArtist}`,
-    type: "track",
-    limit: "1",
-  });
-  const result = await spotifyRequest(`/search?${query}`, {}, clientId, useLocalSpotifyAuth);
-  return result.tracks?.items?.[0] ?? null;
 }
 
 async function applySpotifyPlaylistVisibility(
@@ -455,7 +436,22 @@ export default function Home() {
         setStatus(`Matching song ${index + 1} of ${chosenSongs.length} on Spotify…`);
         matches.push({
           song: chosenSongs[index],
-          track: await findSpotifyTrack(chosenSongs[index], spotifyClientId, localSpotifyAuth),
+          track: await findSpotifyTrack(
+            chosenSongs[index].name,
+            selected.artist.name,
+            chosenSongs[index].searchArtist,
+            async (title, artist) => {
+              const query = new URLSearchParams({
+                q: `track:${title} artist:${artist}`,
+                type: "track",
+                limit: "10",
+              });
+              const result = await spotifyRequest(
+                `/search?${query}`, {}, spotifyClientId, localSpotifyAuth,
+              );
+              return result.tracks?.items ?? [];
+            },
+          ),
         });
       }
 
